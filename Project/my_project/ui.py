@@ -55,7 +55,7 @@ def main():
     app = QApplication([])
 
     # UI文件路径
-    ui_file_path = "ui\project\mai_deploy.ui"  # 确保使用正确的路径格式
+    ui_file_path = "Project\my_project\mai_deploy.ui"  # 确保使用正确的路径格式
 
     # 创建主窗口
     window = MainWindow(ui_file_path)

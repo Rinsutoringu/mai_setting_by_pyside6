@@ -5,8 +5,7 @@
 # @Software: VScode
 
 import sys
-import os
-from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton
+from PySide6.QtWidgets import QApplication
 from interface.main_window import main_window
 
 
@@ -14,10 +13,10 @@ def main():
     app = QApplication([])
 
     # UI文件路径
-    ui_file_path = "Project\interface\main_window.ui"  # 确保使用正确的路径格式
+    main_window_path = "Project\interface\main_window.ui"  # 确保使用正确的路径格式
 
-    # 创建主窗口
-    window = main_window(ui_file_path)
+    # 实例化主界面
+    window = main_window(main_window_path)
 
     # 显示窗口
     window.show()

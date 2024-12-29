@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-# @Time    : 2024/12/30
 # @Author  : RinChord
 # @File    : main_window.py
 # @Software: VScode
@@ -8,7 +6,9 @@ import sys
 import os
 from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton
+from PySide6.QtWidgets import QMainWindow, QPushButton
+
+from interface.port_setting import port_setting
 
 class main_window(QMainWindow):
     def __init__(self, ui_file_path):
@@ -19,13 +19,12 @@ class main_window(QMainWindow):
         # 获取按钮并连接信号
         self.findChild(QPushButton, 'pushButton_1_1').clicked.connect(self.on_button_click)
 
-
-
-    #在这里写点击事件
+        # 实例化 port_setting 窗口
+        self.port_setting_window = port_setting("Project/interface/port_setting.ui")
 
     def on_button_click(self):
+        self.port_setting_window.show()
         print("按钮被点击了！")
-
 
     def load_ui(self, ui_file_path):
         if not os.path.exists(ui_file_path):
@@ -48,6 +47,3 @@ class main_window(QMainWindow):
 
         # 关闭UI文件
         ui_file.close()
-
-
-        

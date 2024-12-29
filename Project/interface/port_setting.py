@@ -64,7 +64,7 @@ class port_setting(QMainWindow):
     # 刷新端口事件
     def refresh_port_click(self):
         print("刷新端口")
-        port = getport("touch")
+        port = getport()
         self.findChild(QTextBrowser, 'touch_port').setText(port[0])
         self.findChild(QTextBrowser, 'aime_port').setText(port[1])
         self.findChild(QTextBrowser, 'led_port').setText(port[2])

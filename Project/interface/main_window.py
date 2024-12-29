@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2023/9/25 22:03
-# @Author  : MinChess
-# @File    : main.py
-# @Software: PyCharm
+# @Time    : 2024/12/30
+# @Author  : RinChord
+# @File    : main_window.py
+# @Software: VScode
 
 import sys
 import os
@@ -10,9 +10,9 @@ from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton
 
-class MainWindow(QMainWindow):
+class main_window(QMainWindow):
     def __init__(self, ui_file_path):
-        super(MainWindow, self).__init__()
+        super(main_window, self).__init__()
 
         # 加载UI文件
         self.load_ui(ui_file_path)

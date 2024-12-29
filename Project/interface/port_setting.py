@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2023/9/25 22:03
-# @Author  : MinChess
-# @File    : main.py
-# @Software: PyCharm
+# @Time    : 2024/12/30
+# @Author  : RinChord
+# @File    : port_setting.py
+# @Software: VScode
 
 import sys
 import os
@@ -10,9 +10,9 @@ from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton
 
-class MainWindow(QMainWindow):
+class mainwindow(QMainWindow):
     def __init__(self, ui_file_path):
-        super(MainWindow, self).__init__()
+        super(mainwindow, self).__init__()
 
         # 加载UI文件
         self.load_ui(ui_file_path)
@@ -51,20 +51,3 @@ class MainWindow(QMainWindow):
 
 
         
-def main():
-    app = QApplication([])
-
-    # UI文件路径
-    ui_file_path = "Project\my_project\mai_deploy.ui"  # 确保使用正确的路径格式
-
-    # 创建主窗口
-    window = MainWindow(ui_file_path)
-
-    # 显示窗口
-    window.show()
-
-    # 运行应用程序
-    sys.exit(app.exec())
-
-if __name__ == "__main__":
-    main()

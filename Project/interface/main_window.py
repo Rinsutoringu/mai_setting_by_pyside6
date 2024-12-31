@@ -6,7 +6,7 @@ import sys
 import os
 from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QMainWindow, QPushButton
+from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox
 
 from interface.port_setting import port_setting
 
@@ -19,12 +19,25 @@ class main_window(QMainWindow):
         # 获取按钮并连接信号
         self.findChild(QPushButton, 'pushButton_1_1').clicked.connect(self.on_button_click)
 
+
+        self.dialog_button = self.findChild(QDialogButtonBox, 'dialog_button')
+        self.dialog_button.accepted.connect(self.close_windows)
+        self.dialog_button.helpRequested.connect(self.close_windows)
+
         # 实例化 port_setting 窗口
         self.port_setting_window = port_setting("Project/interface/port_setting.ui")
 
+
+
+##############################################
     def on_button_click(self):
         self.port_setting_window.show()
         print("按钮被点击了！")
+
+    def close_windows(self):
+        self.close()
+    
+##############################################
 
     def load_ui(self, ui_file_path):
         if not os.path.exists(ui_file_path):

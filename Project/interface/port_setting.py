@@ -9,7 +9,7 @@ import os
 from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox, QTextBrowser
-from function.portediter import setport, getport
+from function.portediter import setport
 
 class port_setting(QMainWindow):
     def __init__(self, ui_file_path):
@@ -64,11 +64,11 @@ class port_setting(QMainWindow):
     # 刷新端口事件
     def refresh_port_click(self):
         print("刷新端口")
-        port = getport()
-        self.findChild(QTextBrowser, 'touch_port').setText(port[0])
-        self.findChild(QTextBrowser, 'aime_port').setText(port[1])
-        self.findChild(QTextBrowser, 'led_port').setText(port[2])
-        self.findChild(QTextBrowser, 'command_port').setText(port[3])
+        # port = getport()
+        # self.findChild(QTextBrowser, 'touch_port').setText(port[0])
+        # self.findChild(QTextBrowser, 'aime_port').setText(port[1])
+        # self.findChild(QTextBrowser, 'led_port').setText(port[2])
+        # self.findChild(QTextBrowser, 'command_port').setText(port[3])
 
     #####################################
 

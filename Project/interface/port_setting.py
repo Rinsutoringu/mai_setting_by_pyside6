@@ -9,7 +9,7 @@ import os
 from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox, QTextBrowser
-from function.portediter import setport
+from Project.function.setport import setport
 
 class port_setting(QMainWindow):
     def __init__(self, ui_file_path):

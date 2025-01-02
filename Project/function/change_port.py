@@ -4,22 +4,29 @@
 # @File    : deviceinfo.py
 # @Software: VScode
 
-## vid=0x0CA3, pid=0x0021
-'''
 
-'''
 import winreg as reg
 import ctypes
 
+
 def is_admin():
+    """
+    验证当前用户是否是管理员
+    """
+
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
     except:
         return False
 
-# 参数： vid：设备的 VID， pid：设备的 PID
-# 返回： 一个包含符合当前设备注册表路径的列表
+
 def find_device_usb_path(vid, pid):
+    """
+    :param vid: 设备的 VID
+    :param pid: 设备的 PID
+    :return: 一个包含符合当前设备注册表路径的列表
+    """
+
     usb_path = "SYSTEM\\CurrentControlSet\\Enum\\USB"
     try:
         with reg.OpenKey(reg.HKEY_LOCAL_MACHINE, usb_path) as usb_key:
@@ -44,24 +51,31 @@ def find_device_usb_path(vid, pid):
         print(f"错误: {e}")
     return None
 
+
 def read_com_port_number(reg_path):
     """
     :param reg_path: 设备注册表路径
     :return: 字符串"COMx"或None
     """
+
     try:
+        # 拼接地址字符串
         parameters_path = f"{reg_path}\\Device Parameters"
+
         with reg.OpenKey(reg.HKEY_LOCAL_MACHINE, parameters_path) as param_key:
             com_port_number = reg.QueryValueEx(param_key, "PortName")[0]
             return com_port_number
-            
+            # 只有这个地址存在时才有返回值
     except Exception as e:
         return None
 
 
-# 参数：  registry_path：待更改设备的注册表路径，例Computer\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Enum\USB\VID_0CA3&PID_0021&MI_06\6&166091be&0&0006\Device Parameters
-#         new_port_name：设备待写入的新 COM 端口名
 def write_com_port_value(registry_path, new_port_name):
+    """
+    :param registry_path: 待更改设备的注册表路径
+    :param new_port_name: 设备待写入的新 COM 端口名
+    """
+
     # print("现在开始更改")
     parameters_path = f"{registry_path}\\Device Parameters"
     try:
@@ -72,8 +86,11 @@ def write_com_port_value(registry_path, new_port_name):
         print(f"修改 {parameters_path} 的 PortName 时发生错误: {e}")
 
 
-
 if __name__ == "__main__":
+    """
+    测试代码
+    """
+
     if not is_admin():
         print("请以管理员身份运行此脚本")
         exit(1)
@@ -91,11 +108,14 @@ if __name__ == "__main__":
 
     # 进一步查找有效的COM子设备
     for device_path in device_paths:
-        print(f"现在查找设备路径{device_path}")
+
+        # 确定当前的设备是否是一个有效的 COM 设备，如果是的话则返回其端口
         current_com_port = read_com_port_number(device_path)
         if current_com_port is None:
             print(f"{path} 不是一个有效的 COM 设备")
             continue
         print(f"现在将 {path} 的 COM 端口更改为: {new_com_ports[index]}")
+
+        # 更改 COM 端口
         write_com_port_value(path, new_com_ports[index])
         index += 1

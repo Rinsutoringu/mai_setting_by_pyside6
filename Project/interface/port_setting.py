@@ -9,7 +9,7 @@ import os
 from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox, QTextBrowser
-from Project.function.setport import setport
+# from Project.function.setport import setport
 
 class port_setting(QMainWindow):
     def __init__(self, ui_file_path):
@@ -32,6 +32,8 @@ class port_setting(QMainWindow):
         self.findChild(QPushButton, 'command_set').clicked.connect(lambda: self.set_port_click('command_select'))
         
         self.findChild(QPushButton, 'Refresh').clicked.connect(self.refresh_port_click)
+
+        self.findChild(QTextBrowser, 'touch_port').setText("1")
 
         #####################################
 
@@ -58,7 +60,7 @@ class port_setting(QMainWindow):
     def set_port_click(self,device):
         select_box = self.findChild(QComboBox, device)
         port = select_box.currentText()
-        setport(device, port)
+        # setport(device, port)
         self.refresh_port_click()
 
     # 刷新端口事件

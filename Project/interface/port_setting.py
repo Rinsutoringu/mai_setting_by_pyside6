@@ -9,22 +9,22 @@ import os
 from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox, QTextBrowser
-# from Project.function.setport import setport
+from function.change_port import is_admin, find_device_usb_path, read_com_port_number, write_com_port_value
 
 class port_setting(QMainWindow):
-    def __init__(self, ui_file_path):
+    def __init__(self, ui_file_path, device_paths, selected_device: int):
         super(port_setting, self).__init__()
-
-        # 加载UI文件
+        
+        self.device_paths = device_paths
+        self.selected_device = selected_device
         self.load_ui(ui_file_path)
 
         #####################################
         # 获取按钮并连接信号
+        #####################################
         self.dialog_button = self.findChild(QDialogButtonBox, 'dialog_button')
         self.dialog_button.accepted.connect(self.close_windows)
         self.dialog_button.helpRequested.connect(self.close_windows)
-
-        self.findChild(QComboBox, 'touch_select').currentIndexChanged.connect(self.on_button_click)
 
         self.findChild(QPushButton, 'touch_set').clicked.connect(lambda: self.set_port_click('touch_select'))
         self.findChild(QPushButton, 'aime_set').clicked.connect(lambda: self.set_port_click('aime_select'))
@@ -32,45 +32,59 @@ class port_setting(QMainWindow):
         self.findChild(QPushButton, 'command_set').clicked.connect(lambda: self.set_port_click('command_select'))
         
         self.findChild(QPushButton, 'Refresh').clicked.connect(self.refresh_port_click)
-
-        self.findChild(QTextBrowser, 'touch_port').setText("1")
-
         #####################################
-
-
+        # 界面逻辑
+        #####################################
+        self.update_ports()
+        #####################################
 
     #####################################
     #在这里写点击事件
-
-    # 下拉框选择触发事件
-    # def touch_select(self):
-    #     print("选择了")
-    #     a = self.findChild(QComboBox, 'touch_select').currentText()
-    #     print("当前文本为：", a)
+    #####################################
 
     # 关闭窗口事件
     def close_windows(self):
         self.close()
 
-    # 测试用事件
-    def on_button_click(self):
-        print("按钮被点击了！")
-
-    # 设置端口事件
+    # 设置端口的事件
     def set_port_click(self,device):
-        select_box = self.findChild(QComboBox, device)
-        port = select_box.currentText()
-        # setport(device, port)
-        self.refresh_port_click()
+        i = int(self.selected_device) - 1
+
+        port_select_box = self.findChild(QComboBox, device)
+        port = "COM"+port_select_box.currentText()
+        print("为", device, "设备配置", port, "端口")
+        if device == 'touch_select':
+            write_com_port_value(self.device_paths[i][0], port)
+        elif device == 'aime_select':
+            write_com_port_value(self.device_paths[i][1], port)
+        elif device == 'led_select':
+            write_com_port_value(self.device_paths[i][2], port)
+        elif device == 'command_select':
+            write_com_port_value(self.device_paths[i][3], port)
+        self.update_ports()
 
     # 刷新端口事件
     def refresh_port_click(self):
-        print("刷新端口")
-        # port = getport()
-        # self.findChild(QTextBrowser, 'touch_port').setText(port[0])
-        # self.findChild(QTextBrowser, 'aime_port').setText(port[1])
-        # self.findChild(QTextBrowser, 'led_port').setText(port[2])
-        # self.findChild(QTextBrowser, 'command_port').setText(port[3])
+        self.update_ports(self)
+
+
+    # 获取设备端口
+    def update_ports(self):
+        i = int(self.selected_device) - 1
+        touch_port = read_com_port_number(self.device_paths[i][0])[3:]
+        aime_port = read_com_port_number(self.device_paths[i][1])[3:]
+        led_port = read_com_port_number(self.device_paths[i][2])[3:]
+        command_port = read_com_port_number(self.device_paths[i][3])[3:]
+
+        touch_port_box = self.findChild(QTextBrowser, 'touch_port')
+        aime_port_box = self.findChild(QTextBrowser, 'aime_port')
+        led_port_box = self.findChild(QTextBrowser, 'led_port')
+        command_port_box = self.findChild(QTextBrowser, 'command_port')
+
+        touch_port_box.setText(touch_port)
+        aime_port_box.setText(aime_port)
+        led_port_box.setText(led_port)
+        command_port_box.setText(command_port)
 
     #####################################
 

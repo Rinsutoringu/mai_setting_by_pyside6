@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>353</width>
-    <height>218</height>
+    <width>394</width>
+    <height>229</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>353</width>
-    <height>218</height>
+    <width>394</width>
+    <height>229</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>353</width>
-    <height>218</height>
+    <width>394</width>
+    <height>229</height>
    </size>
   </property>
   <property name="baseSize">
@@ -34,8 +34,8 @@
   <widget class="QDialogButtonBox" name="dialog_button">
    <property name="geometry">
     <rect>
-     <x>-20</x>
-     <y>180</y>
+     <x>20</x>
+     <y>190</y>
      <width>361</width>
      <height>31</height>
     </rect>
@@ -49,7 +49,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>331</width>
+     <width>371</width>
      <height>161</height>
     </rect>
    </property>
@@ -64,7 +64,7 @@
         <widget class="QTextBrowser" name="command_port">
          <property name="geometry">
           <rect>
-           <x>120</x>
+           <x>130</x>
            <y>20</y>
            <width>31</width>
            <height>31</height>
@@ -84,7 +84,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <widget class="QPushButton" name="command_set">
          <property name="geometry">
           <rect>
-           <x>80</x>
+           <x>90</x>
            <y>20</y>
            <width>31</width>
            <height>31</height>
@@ -99,7 +99,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <rect>
            <x>40</x>
            <y>20</y>
-           <width>41</width>
+           <width>51</width>
            <height>31</height>
           </rect>
          </property>
@@ -137,7 +137,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <widget class="QTextBrowser" name="led_port">
          <property name="geometry">
           <rect>
-           <x>120</x>
+           <x>130</x>
            <y>20</y>
            <width>31</width>
            <height>31</height>
@@ -157,7 +157,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <widget class="QPushButton" name="led_set">
          <property name="geometry">
           <rect>
-           <x>80</x>
+           <x>90</x>
            <y>20</y>
            <width>31</width>
            <height>31</height>
@@ -172,7 +172,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <rect>
            <x>40</x>
            <y>20</y>
-           <width>41</width>
+           <width>51</width>
            <height>31</height>
           </rect>
          </property>
@@ -210,7 +210,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <widget class="QPushButton" name="aime_set">
          <property name="geometry">
           <rect>
-           <x>80</x>
+           <x>90</x>
            <y>20</y>
            <width>31</width>
            <height>31</height>
@@ -223,7 +223,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <widget class="QTextBrowser" name="aime_port">
          <property name="geometry">
           <rect>
-           <x>120</x>
+           <x>130</x>
            <y>20</y>
            <width>31</width>
            <height>31</height>
@@ -245,18 +245,18 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <rect>
            <x>40</x>
            <y>20</y>
-           <width>41</width>
+           <width>51</width>
            <height>31</height>
           </rect>
          </property>
          <item>
           <property name="text">
-           <string>1</string>
+           <string>21</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>2</string>
+           <string>22</string>
           </property>
          </item>
         </widget>
@@ -283,7 +283,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <widget class="QPushButton" name="touch_set">
          <property name="geometry">
           <rect>
-           <x>80</x>
+           <x>91</x>
            <y>20</y>
            <width>31</width>
            <height>31</height>
@@ -296,27 +296,27 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <widget class="QComboBox" name="touch_select">
          <property name="geometry">
           <rect>
-           <x>39</x>
+           <x>40</x>
            <y>20</y>
-           <width>41</width>
+           <width>51</width>
            <height>31</height>
           </rect>
          </property>
          <item>
           <property name="text">
-           <string>1</string>
+           <string>90</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>2</string>
+           <string>11</string>
           </property>
          </item>
         </widget>
         <widget class="QTextBrowser" name="touch_port">
          <property name="geometry">
           <rect>
-           <x>120</x>
+           <x>131</x>
            <y>20</y>
            <width>31</width>
            <height>31</height>

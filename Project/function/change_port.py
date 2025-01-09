@@ -78,6 +78,8 @@ def find_device_usb_path(vid, pid):
     return None
 
 
+
+
 def read_com_port_number(reg_path):
     """
     :param reg_path: 设备注册表路径
@@ -112,6 +114,8 @@ def write_com_port_value(registry_path, new_port_name):
         print(f"修改 {parameters_path} 的 PortName 时发生错误: {e}")
 
 
+
+
 if __name__ == "__main__":
     """
     测试代码
@@ -122,7 +126,7 @@ if __name__ == "__main__":
         exit(1)
     vid = "0CA3"  # 替换为你要查找的 VID
     pid = "0021"  # 替换为你要查找的 PID
-    new_com_ports = ["COM80", "COM81", "COM82", "COM83"]  # 替换为你希望设置的新端口名
+    new_com_ports = ["COM46", "COM45", "COM44", "COM43"]  # 替换为你希望设置的新端口名
     index = 0
     which_device = 0  # 你想要访问连接到电脑的哪台设备?
 

@@ -9,7 +9,7 @@ import os
 from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox, QTextBrowser
-from function.change_port import is_admin, find_device_usb_path, read_com_port_number, write_com_port_value
+from function.change_port import read_com_port_number, write_com_port_value, show_warning
 
 class port_setting(QMainWindow):
     def __init__(self, ui_file_path, device_paths, selected_device: int):
@@ -52,15 +52,19 @@ class port_setting(QMainWindow):
 
         port_select_box = self.findChild(QComboBox, device)
         port = "COM"+port_select_box.currentText()
-        print("为", device, "设备配置", port, "端口")
+        # print("为", device, "设备配置", port, "端口")
         if device == 'touch_select':
-            write_com_port_value(self.device_paths[i][0], port)
+            if write_com_port_value(self.device_paths[i][0], port) == False:
+                show_warning("port error", "Change port fail!")
         elif device == 'aime_select':
-            write_com_port_value(self.device_paths[i][1], port)
+            if write_com_port_value(self.device_paths[i][1], port) == False:
+                show_warning("port error", "Change port fail!")
         elif device == 'led_select':
-            write_com_port_value(self.device_paths[i][2], port)
+            if write_com_port_value(self.device_paths[i][2], port) == False:
+                show_warning("port error", "Change port fail!")
         elif device == 'command_select':
-            write_com_port_value(self.device_paths[i][3], port)
+            if write_com_port_value(self.device_paths[i][3], port) == False:
+                show_warning("port error", "Change port fail!")
         self.update_ports()
 
     # 刷新端口事件
@@ -72,9 +76,17 @@ class port_setting(QMainWindow):
     def update_ports(self):
         i = int(self.selected_device) - 1
         touch_port = read_com_port_number(self.device_paths[i][0])[3:]
+        if touch_port is None:
+            show_warning("device error", "Cannot get touch device port!")
         aime_port = read_com_port_number(self.device_paths[i][1])[3:]
+        if aime_port is None:
+            show_warning("device error", "Cannot get aime device port!")
         led_port = read_com_port_number(self.device_paths[i][2])[3:]
+        if led_port is None:
+            show_warning("device error", "Cannot get led device port!")
         command_port = read_com_port_number(self.device_paths[i][3])[3:]
+        if command_port is None:
+            show_warning("device error", "Cannot get command device port!")
 
         touch_port_box = self.findChild(QTextBrowser, 'touch_port')
         aime_port_box = self.findChild(QTextBrowser, 'aime_port')
@@ -89,26 +101,19 @@ class port_setting(QMainWindow):
     #####################################
 
     def load_ui(self, ui_file_path):
+        """
+        加载UI
+        """
         if not os.path.exists(ui_file_path):
             print(f"文件不存在: {ui_file_path}")
             sys.exit(-1)
 
         print("当前工作目录:", os.getcwd())
-
-        # 创建UI文件对象
         ui_file = QFile(ui_file_path)
+
         if not ui_file.open(QIODevice.ReadOnly):
-            print("无法打开UI文件")
             sys.exit(-1)
-
-        # 创建UI加载器
         loader = QUiLoader()
-
-        # 加载UI文件并实例化为窗口对象
         self.setCentralWidget(loader.load(ui_file))
 
-        # 关闭UI文件
         ui_file.close()
-
-
-        

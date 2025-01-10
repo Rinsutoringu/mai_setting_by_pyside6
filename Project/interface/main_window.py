@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QCombo
 from .port_setting import port_setting
 
 # 后端函数
-from function.change_port import is_admin, find_device_usb_path, read_com_port_number, write_com_port_value
+from function.change_port import find_device_reg_path, show_warning
 
 
 class main_window(QMainWindow):
@@ -26,7 +26,10 @@ class main_window(QMainWindow):
         self.selected_device = 1
         self.vid = "0CA3"  
         self.pid = "0021"  
-        self.device_paths = find_device_usb_path(self.vid, self.pid)
+        self.device_paths = find_device_reg_path(self.vid, self.pid)
+        if self.device_paths is None:
+            show_warning("error", "No device found!")
+            # sys.exit(-1)
         ##############################################
         # 实例化 port_setting 窗口
         ##############################################
@@ -34,7 +37,7 @@ class main_window(QMainWindow):
         ##############################################
         # 获取按钮并连接信号
         ##############################################
-        self.findChild(QPushButton, 'pushButton_1_1').clicked.connect(self.on_button_click)
+        self.findChild(QPushButton, 'port_setting').clicked.connect(self.open_port_setting)
         self.findChild(QPushButton, 'reconfirm_button').clicked.connect(self.reconfirm)
         
         # 初始化底部多功能控件
@@ -54,68 +57,75 @@ class main_window(QMainWindow):
     # 事件
     ##############################################
     
-    # 窗口关闭事件
     def close_windows(self):
+        """
+        关闭窗口
+        """
         self.close()
 
-    # 测试事件
-    def on_button_click(self):
+    def open_port_setting(self):
+        """
+        打开端口设置窗口
+        """
         self.port_setting_window.show()
-        print("按钮被点击了！")
 
-    # 为设备选择器添加设备下拉列表
     def refresh_device_selector(self):
-        # 获取设备路径的二维数组
-        # 清空 device_selector 的下拉列表
+        """
+        为设备选择器添加设备下拉列表
+        获取设备路径的二维数组
+        清空 device_selector 的下拉列表
+        """
         self.device_selector.clear()
 
         # 根据二维数组的列数，动态生成下拉列表
         for i in range(len(self.device_paths)):
             self.device_selector.addItem(f"设备 {i + 1}")
 
-    # 获取用户选择
     def on_device_selected(self, index):
+        """
+        获取用户选择
+        """
         self.update_port_setting(self.device_selector.itemText(index))
 
-    # 再次确认事件
     def reconfirm(self):
+        """
+        再次确认事件
+        """
         self.update_port_setting(self.device_selector.currentText())
 
-    # 更新端口设置窗口的信息
     def update_port_setting(self, selected_text):
-
+        """
+        更新端口设置窗口的信息
+        :param selected_text: 选择的设备的文本
+        """
         if not selected_text :
-            print("未选择设备")
+
             return
         self.selected_device = selected_text[3:]
         if not self.selected_device.isdigit():
-            print("类型错误")
+            show_warning("error", "The selected device is illegal!")
             return
 
         # 经过有效性检查后，更新端口设置窗口的信息
         self.port_setting_window.selected_device = self.selected_device
         self.port_setting_window.update_ports()
-        print(f"选择了设备: {self.selected_device}")
+        # print(f"选择了设备: {self.selected_device}")
     ##############################################
 
     def load_ui(self, ui_file_path):
+        """
+        加载UI
+        """
         if not os.path.exists(ui_file_path):
             print(f"文件不存在: {ui_file_path}")
             sys.exit(-1)
 
         print("当前工作目录:", os.getcwd())
-
-        # 创建UI文件对象
         ui_file = QFile(ui_file_path)
+
         if not ui_file.open(QIODevice.ReadOnly):
-            print("无法打开UI文件")
             sys.exit(-1)
-
-        # 创建UI加载器
         loader = QUiLoader()
-
-        # 加载UI文件并实例化为窗口对象
         self.setCentralWidget(loader.load(ui_file))
 
-        # 关闭UI文件
         ui_file.close()

@@ -4,6 +4,7 @@
 
 import sys
 import os
+import ctypes
 from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox
@@ -31,28 +32,30 @@ class main_window(QMainWindow):
             show_warning("error", "No device found!")
             # sys.exit(-1)
         ##############################################
-        # 实例化 port_setting 窗口
+        # 初始化子窗口
         ##############################################
         self.port_setting_window = port_setting("Project/interface/port_setting.ui", self.device_paths, self.selected_device)
         ##############################################
-        # 获取按钮并连接信号
+        # 初始化按钮
         ##############################################
-        self.findChild(QPushButton, 'port_setting').clicked.connect(self.open_port_setting)
-        self.findChild(QPushButton, 'reconfirm_button').clicked.connect(self.reconfirm)
-        
-        # 初始化底部多功能控件
+        self.port_setting = self.findChild(QPushButton, 'port_setting')
+        self.reconfirm_button = self.findChild(QPushButton, 'reconfirm_button')
+        self.admin_button = self.findChild(QPushButton, 'admin_button')
         self.dialog_button = self.findChild(QDialogButtonBox, 'dialog_button')
+        self.device_selector = self.findChild(QComboBox, 'device_selector')
+        ##############################################
+        # 事件绑定
+        ##############################################
+        self.port_setting.clicked.connect(self.open_port_setting)
+        self.reconfirm_button.clicked.connect(self.reconfirm)
+        self.admin_button.clicked.connect(self.request_admin_privileges)
         self.dialog_button.accepted.connect(self.close_windows)
         self.dialog_button.helpRequested.connect(self.close_windows)
-        
-        # 初始化下拉框控件
-        self.device_selector = self.findChild(QComboBox, 'device_selector')
         self.device_selector.currentIndexChanged.connect(self.on_device_selected)
         self.refresh_device_selector()
+        self.is_admin()
         ##############################################
-        
-
-
+    
     ##############################################
     # 事件
     ##############################################
@@ -109,10 +112,32 @@ class main_window(QMainWindow):
         # 经过有效性检查后，更新端口设置窗口的信息
         self.port_setting_window.selected_device = self.selected_device
         self.port_setting_window.update_ports()
-        # print(f"选择了设备: {self.selected_device}")
+
+    def is_admin(self):
+        """
+        验证当前用户是否是管理员
+        :return: 不是返回False, 是返回True
+        """
+        if ctypes.windll.shell32.IsUserAnAdmin() == 0:
+            return False
+        self.admin_button.setText("Admin Active !")
+        self.admin_button.setStyleSheet("color: rgb(0, 128, 0)")
+        return True
+            
+
+    def request_admin_privileges(self):
+        """
+        请求管理员权限
+        """
+        if self.is_admin() == True:
+            show_warning("Hey!", "Escalated already!")
+        else:
+            ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, ' '.join(sys.argv), None, 0)
+
+
     ##############################################
 
-    def load_ui(self, ui_file_path):
+    def load_ui(self, ui_file_path):    
         """
         加载UI
         """

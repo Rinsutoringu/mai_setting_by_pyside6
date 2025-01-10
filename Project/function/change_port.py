@@ -25,16 +25,7 @@ def show_warning(errortype="warning", message="Something went wrong!"):
     msg_box.exec()
 
 
-def is_admin():
-    """
-    验证当前用户是否是管理员
-    :return: 失败返回False
-    """
 
-    try:
-        return ctypes.windll.shell32.IsUserAnAdmin()
-    except:
-        return False
 
 
 def find_device_reg_path(vid, pid):

@@ -47,9 +47,9 @@
    <property name="geometry">
     <rect>
      <x>510</x>
-     <y>330</y>
+     <y>333</y>
      <width>156</width>
-     <height>24</height>
+     <height>31</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
@@ -90,7 +90,7 @@
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Terminal&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;Terminal&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
     <widget class="QTextBrowser" name="textBrowser">
@@ -199,9 +199,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <property name="geometry">
       <rect>
        <x>210</x>
-       <y>170</y>
+       <y>163</y>
        <width>41</width>
-       <height>24</height>
+       <height>31</height>
       </rect>
      </property>
      <property name="text">
@@ -451,74 +451,22 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </property>
    </widget>
   </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget">
+  <widget class="QPushButton" name="admin_button">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>320</y>
-     <width>462</width>
-     <height>51</height>
+     <x>30</x>
+     <y>330</y>
+     <width>136</width>
+     <height>31</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Connection state:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; color:#5ecc05;&quot;&gt;Success&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <widget class="QLabel" name="buttom_lable_3">
-      <property name="minimumSize">
-       <size>
-        <width>100</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;a href=&quot;111&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#003e92;&quot;&gt;What's New&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLabel" name="buttom_lable_4">
-      <property name="minimumSize">
-       <size>
-        <width>100</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;a href=&quot;111&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#003e92;&quot;&gt;Contect US&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLabel" name="buttom_lable_5">
-      <property name="minimumSize">
-       <size>
-        <width>100</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;a href=&quot;111&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#003e92;&quot;&gt;LingyunKawaii&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
+   <property name="styleSheet">
+    <string notr="true">
+color: rgb(255, 58, 58);</string>
+   </property>
+   <property name="text">
+    <string>Active Admin</string>
+   </property>
   </widget>
  </widget>
  <tabstops>

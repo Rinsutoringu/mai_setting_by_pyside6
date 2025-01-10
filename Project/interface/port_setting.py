@@ -42,12 +42,17 @@ class port_setting(QMainWindow):
     #在这里写点击事件
     #####################################
 
-    # 关闭窗口事件
     def close_windows(self):
+        """
+        关闭窗口事件
+        """
         self.close()
 
-    # 设置端口的事件
+
     def set_port_click(self,device):
+        """
+        设置端口的事件
+        """
         i = int(self.selected_device) - 1
 
         port_select_box = self.findChild(QComboBox, device)
@@ -67,13 +72,18 @@ class port_setting(QMainWindow):
                 show_warning("port error", "Change port fail!")
         self.update_ports()
 
-    # 刷新端口事件
+
     def refresh_port_click(self):
-        self.update_ports(self)
+        """
+        新端口事件
+        """
+        self.update_ports()
 
 
-    # 获取设备端口
     def update_ports(self):
+        """
+        获取设备端口
+        """
         i = int(self.selected_device) - 1
         touch_port = read_com_port_number(self.device_paths[i][0])[3:]
         if touch_port is None:

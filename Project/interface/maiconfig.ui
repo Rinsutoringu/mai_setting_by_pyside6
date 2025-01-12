@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>835</width>
-    <height>662</height>
+    <width>737</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,8 +16,8 @@
   <widget class="QDialogButtonBox" name="dialog_button">
    <property name="geometry">
     <rect>
-     <x>670</x>
-     <y>630</y>
+     <x>570</x>
+     <y>660</y>
      <width>156</width>
      <height>24</height>
     </rect>
@@ -45,14 +45,14 @@
   <widget class="QFrame" name="frame_2">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>60</y>
-     <width>631</width>
-     <height>521</height>
+     <x>-10</x>
+     <y>10</y>
+     <width>751</width>
+     <height>711</height>
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">border-image: url(:/icon/maitouch.png);</string>
+    <string notr="true">border-image: url(:/icon/maitouch.svg);</string>
    </property>
    <property name="frameShape">
     <enum>QFrame::Shape::StyledPanel</enum>
@@ -60,25 +60,6 @@
    <property name="frameShadow">
     <enum>QFrame::Shadow::Raised</enum>
    </property>
-   <widget class="QFrame" name="frame">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>390</y>
-      <width>141</width>
-      <height>101</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">border-image: url(:/icon/A1area);</string>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::Shape::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Shadow::Raised</enum>
-    </property>
-   </widget>
   </widget>
  </widget>
  <resources>

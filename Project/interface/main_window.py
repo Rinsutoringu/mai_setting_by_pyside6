@@ -13,7 +13,7 @@ from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QCombo
 from .port_setting import port_setting
 
 # 后端函数
-from function.change_port import find_device_reg_path, show_warning
+from function.change_port import find_device_usb_path, show_warning, find_device_reg_path
 
 
 class main_window(QMainWindow):
@@ -27,7 +27,7 @@ class main_window(QMainWindow):
         self.selected_device = 1
         self.vid = "0CA3"  
         self.pid = "0021"  
-        self.device_paths = find_device_reg_path(self.vid, self.pid)
+        self.device_paths = find_device_usb_path(self.vid, self.pid)
         if self.device_paths is None:
             show_warning("error", "No device found!")
             # sys.exit(-1)
@@ -124,7 +124,6 @@ class main_window(QMainWindow):
         self.admin_button.setStyleSheet("color: rgb(0, 128, 0)")
         return True
             
-
     def request_admin_privileges(self):
         """
         请求管理员权限
@@ -133,7 +132,7 @@ class main_window(QMainWindow):
             show_warning("Hey!", "Escalated already!")
         else:
             ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, ' '.join(sys.argv), None, 0)
-
+            self.close()
 
     ##############################################
 

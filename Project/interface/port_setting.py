@@ -84,6 +84,9 @@ class port_setting(QMainWindow):
         """
         获取设备端口
         """
+        if self.selected_device == 1:
+            show_warning("device error", "Device Not Found!")
+            return
         i = int(self.selected_device) - 1
         touch_port = read_com_port_number(self.device_paths[i][0])[3:]
         if touch_port is None:

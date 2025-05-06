@@ -24,10 +24,6 @@ def show_warning(errortype="warning", message="Something went wrong!"):
     msg_box.setStandardButtons(QMessageBox.Ok)
     msg_box.exec()
 
-
-
-
-
 def find_device_reg_path(vid, pid):
     """
     注册表模式函数
@@ -81,7 +77,6 @@ def find_device_reg_path(vid, pid):
             return device_reg_paths
     except Exception as e:
         return None
-    
 
 def find_device_usb_path(vid, pid):
     """
@@ -112,7 +107,6 @@ def find_device_usb_path(vid, pid):
             device_serial[index].append("SYSTEM\\CurrentControlSet\\Enum\\USB\\VID_0CA3&PID_0021&MI_06\\" + parent_id + "&0006")
             device_serial[index].append("SYSTEM\\CurrentControlSet\\Enum\\USB\\VID_0CA3&PID_0021&MI_08\\" + parent_id + "&0008")
     return device_serial
-
 
 def read_com_port_number(reg_path):
     """
@@ -156,9 +150,9 @@ if __name__ == "__main__":
     测试代码
     """
 
-    if not is_admin():
-        print("请以管理员身份运行此脚本")
-        exit(1)
+    # if not is_admin():
+    #     print("请以管理员身份运行此脚本")
+    #     exit(1)
     vid = "0CA3"  # 替换为你要查找的 VID
     pid = "0021"  # 替换为你要查找的 PID
     new_com_ports = ["COM46", "COM45", "COM44", "COM43"]  # 替换为你希望设置的新端口名

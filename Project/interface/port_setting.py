@@ -8,7 +8,7 @@ import sys
 import os
 from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox, QTextBrowser
+from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox, QTextBrowser, QLabel
 from function.change_port import read_com_port_number, write_com_port_value, show_warning
 
 class port_setting(QMainWindow):
@@ -16,6 +16,17 @@ class port_setting(QMainWindow):
         super(port_setting, self).__init__()
         
         self.device_paths = device_paths
+        # 检查 device_paths 是否为 None 或空
+        if not self.device_paths:
+            show_warning("Initialization Error", "Device paths are invalid or empty!")
+            self.label = QLabel("No Device Found", self)
+            return
+
+        # 检查 device_paths 的结构是否符合预期
+        for index, path in enumerate(self.device_paths):
+            if not isinstance(path, list) or len(path) < 4:
+                show_warning("Initialization Error", f"Device path at index {index} is invalid: {path}")
+                return
         self.selected_device = selected_device
         self.load_ui(ui_file_path)
 

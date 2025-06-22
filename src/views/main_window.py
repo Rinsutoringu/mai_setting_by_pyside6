@@ -30,8 +30,8 @@ class main_window(QMainWindow):
         
         # DEBUG
         # self.selected_device = 1
-        # self.vid = "0CA3"  
-        # self.pid = "0021"  
+        self.vid = "0CA3"  
+        self.pid = "0021"  
 
         self.device_paths = find_device_usb_path(self.vid, self.pid)
         if self.device_paths is None:
@@ -92,8 +92,8 @@ class main_window(QMainWindow):
         for i in range(len(self.device_paths)):
             self.devices[i] = Device(device_path=self.device_paths[i])
             if self.devices[i].check_connect():
-                self.devices[i] = Device(device_path=self.device_paths[i])
-                self.device_selector.addItem(f"Device {i + 1}")
+                # 提取设备关键信息
+                self.device_selector.addItem(f"Device {i + 1} ({self.devices[i].getDevicePath()[0][58:68]})")
             # else:
                 # 这玩意不该显示出来
                 # self.device_selector.addItem(f"设备 {i + 1}(未连接)")

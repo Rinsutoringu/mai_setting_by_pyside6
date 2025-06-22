@@ -25,9 +25,13 @@ class Device:
         if device_path:
             self.update_port()
             self.get_port()
+            self.check_connect()
 
     def __repr__(self):
-        return f"Device({self.device_path}, {self.touch_port}, {self.aime_port}, {self.led_port}, {self.command_port})"
+        return f"Device({self.device_path},{self.isConnect} {self.touch_port}, {self.aime_port}, {self.led_port}, {self.command_port})"
+
+    def setDevicePath(self, device_path):
+        self.device_path = device_path
 
     def getDevicePath(self):
         return self.device_path
@@ -62,16 +66,16 @@ class Device:
         """
         获取设备端口
         """
-        touch_port = read_com_port_number(self.device_path)[3:]
+        touch_port = read_com_port_number(self.device_path[0])[3:]
         if touch_port is None:
             show_warning("device error", "Cannot get touch device port!")
-        aime_port = read_com_port_number(self.device_path)[3:]
+        aime_port = read_com_port_number(self.device_path[0])[3:]
         if aime_port is None:
             show_warning("device error", "Cannot get aime device port!")
-        led_port = read_com_port_number(self.device_path)[3:]
+        led_port = read_com_port_number(self.device_path[0])[3:]
         if led_port is None:
             show_warning("device error", "Cannot get led device port!")
-        command_port = read_com_port_number(self.device_path)[3:]
+        command_port = read_com_port_number(self.device_path[0])[3:]
         if command_port is None:
             show_warning("device error", "Cannot get command device port!")
                 

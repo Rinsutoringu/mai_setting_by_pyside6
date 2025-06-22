@@ -102,6 +102,9 @@ class port_setting(QMainWindow):
         touch_port = read_com_port_number(self.device_paths[i][0])[3:]
         if touch_port is None:
             show_warning("device error", "Cannot get touch device port!")
+            
+        # TODO
+        # touch_port = 
         aime_port = read_com_port_number(self.device_paths[i][1])[3:]
         if aime_port is None:
             show_warning("device error", "Cannot get aime device port!")

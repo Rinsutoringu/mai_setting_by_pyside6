@@ -9,6 +9,9 @@ from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox
 
+# 导入设备模型
+from models.device_model import Device
+
 # 其他窗口模块
 from .port_setting import port_setting
 
@@ -24,12 +27,16 @@ class main_window(QMainWindow):
         ##############################################
         # 初始化成员变量
         ##############################################
-        self.selected_device = 1
-        self.vid = "0CA3"  
-        self.pid = "0021"  
+        
+        # DEBUG
+        # self.selected_device = 1
+        # self.vid = "0CA3"  
+        # self.pid = "0021"  
+
         self.device_paths = find_device_usb_path(self.vid, self.pid)
         if self.device_paths is None:
             show_warning("error", "No device found!")
+        self.devices = {}
             # sys.exit(-1)
         ##############################################
         # 初始化子窗口
@@ -81,8 +88,15 @@ class main_window(QMainWindow):
         self.device_selector.clear()
 
         # 根据二维数组的列数，动态生成下拉列表
+        # device_paths是一个二维数组，列数为识别到的合法设备数量，行为每个串口子设备的注册表路径
         for i in range(len(self.device_paths)):
-            self.device_selector.addItem(f"设备 {i + 1}")
+            self.devices[i] = Device(device_path=self.device_paths[i])
+            if self.devices[i].check_connect():
+                self.devices[i] = Device(device_path=self.device_paths[i])
+                self.device_selector.addItem(f"Device {i + 1}")
+            # else:
+                # 这玩意不该显示出来
+                # self.device_selector.addItem(f"设备 {i + 1}(未连接)")
 
     def on_device_selected(self, index):
         """

@@ -9,7 +9,7 @@ import os
 from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox, QTextBrowser, QLabel
-from function.change_port import read_com_port_number, write_com_port_value, show_warning
+from utils.port_utils import read_com_port_number, write_com_port_value, show_warning
 
 class port_setting(QMainWindow):
     def __init__(self, ui_file_path, device_paths, selected_device: int):
@@ -102,9 +102,6 @@ class port_setting(QMainWindow):
         touch_port = read_com_port_number(self.device_paths[i][0])[3:]
         if touch_port is None:
             show_warning("device error", "Cannot get touch device port!")
-            
-        # TODO
-        # touch_port = 
         aime_port = read_com_port_number(self.device_paths[i][1])[3:]
         if aime_port is None:
             show_warning("device error", "Cannot get aime device port!")

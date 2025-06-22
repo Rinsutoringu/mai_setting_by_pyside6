@@ -6,7 +6,7 @@
 
 import sys
 from PySide6.QtWidgets import QApplication
-from interface.main_window import main_window
+from views.main_window import main_window
 
 
 def main():

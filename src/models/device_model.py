@@ -1,3 +1,6 @@
+from utils.port_utils import read_com_port_number
+from utils.warning import show_warning
+
 
 class Device:
     
@@ -19,6 +22,9 @@ class Device:
         self.isConnect = False
 
         # TODO 自动获取设备当前各设备端口
+        if device_path:
+            self.update_port()
+            self.get_port()
 
     def __repr__(self):
         return f"Device({self.device_path}, {self.touch_port}, {self.aime_port}, {self.led_port}, {self.command_port})"
@@ -51,9 +57,26 @@ class Device:
 
         self.isConnect = True
         return True
-    
+
+    def get_port(self):
+        """
+        获取设备端口
+        """
+        touch_port = read_com_port_number(self.device_path)[3:]
+        if touch_port is None:
+            show_warning("device error", "Cannot get touch device port!")
+        aime_port = read_com_port_number(self.device_path)[3:]
+        if aime_port is None:
+            show_warning("device error", "Cannot get aime device port!")
+        led_port = read_com_port_number(self.device_path)[3:]
+        if led_port is None:
+            show_warning("device error", "Cannot get led device port!")
+        command_port = read_com_port_number(self.device_path)[3:]
+        if command_port is None:
+            show_warning("device error", "Cannot get command device port!")
+                
     def update_port(self):
         """
-        更新设备端口
+        更新注册表设备端口
         """
         # 添加设备端口更新逻辑

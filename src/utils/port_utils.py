@@ -6,10 +6,8 @@
 
 
 import winreg as reg
-import ctypes
 import usb.core
 import usb.util
-from PySide6.QtWidgets import QMessageBox
 
 
 def find_device_reg_path(vid, pid):

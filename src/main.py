@@ -13,7 +13,7 @@ def main():
     app = QApplication([])
 
     # UI文件路径
-    main_window_path = "Project\interface\main_window.ui"  # 确保使用正确的路径格式
+    main_window_path = "src/ui/main_window.ui"  # 确保使用正确的路径格式
 
     # 实例化主界面
     window = main_window(main_window_path)

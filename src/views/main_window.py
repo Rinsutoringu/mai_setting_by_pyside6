@@ -15,21 +15,30 @@ from models.device_model import Device
 # 其他窗口模块
 from .port_setting import port_setting
 
-# 后端函数
-from function.change_port import find_device_usb_path, show_warning, find_device_reg_path
+# 工具函数
+from utils.port_utils import find_device_usb_path
+from utils.warning import show_warning
+
 
 
 class main_window(QMainWindow):
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(main_window, cls).__new__(cls)
+        return cls._instance
+
     def __init__(self, ui_file_path):
+        if hasattr(self, '_initialized') and self._initialized:
+            return
         super(main_window, self).__init__()
+        self._initialized = True
         self.load_ui(ui_file_path)
 
         ##############################################
         # 初始化成员变量
         ##############################################
-        
-        # DEBUG
-        # self.selected_device = 1
         self.vid = "0CA3"  
         self.pid = "0021"  
 
@@ -37,11 +46,13 @@ class main_window(QMainWindow):
         if self.device_paths is None:
             show_warning("error", "No device found!")
         self.devices = {}
-            # sys.exit(-1)
+
+        # 先初始化 selected_device，假设默认选第一个设备
+        self.selected_device = 0
         ##############################################
         # 初始化子窗口
         ##############################################
-        self.port_setting_window = port_setting("Project/interface/port_setting.ui", self.device_paths, self.selected_device)
+        self.port_setting_window = port_setting("src/ui/port_setting.ui", self.device_paths, self.selected_device, main_window_instance=self)
         ##############################################
         # 初始化按钮
         ##############################################
@@ -102,13 +113,22 @@ class main_window(QMainWindow):
         """
         获取用户选择
         """
-        self.update_port_setting(self.device_selector.itemText(index))
+        self.userChooseDevice = self.device_selector.itemText(index)
+        # self.update_port_setting(self.device_selector.itemText(index))
 
     def reconfirm(self):
         """
         再次确认事件
         """
-        self.update_port_setting(self.device_selector.currentText())
+        self.userChooseDevice =  self.device_selector.currentText()
+        # self.update_port_setting(self.device_selector.currentText())
+
+    def getUserChooseDevice(self):
+        """
+        获取用户选择的设备
+        :return: 用户选择的设备文本
+        """
+        return self.userChooseDevice
 
     def update_port_setting(self, selected_text):
         """
@@ -147,6 +167,13 @@ class main_window(QMainWindow):
         else:
             ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, ' '.join(sys.argv), None, 0)
             self.close()
+
+    def getDevices(self):
+        """
+        获取当前连接的设备
+        :return: 设备列表
+        """
+        return self.devices
 
     ##############################################
 

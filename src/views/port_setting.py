@@ -9,12 +9,22 @@ import os
 from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox, QTextBrowser, QLabel
-from utils.port_utils import read_com_port_number, write_com_port_value, show_warning
+from utils.warning import show_warning
 
 class port_setting(QMainWindow):
-    def __init__(self, ui_file_path, device_paths, selected_device: int):
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(port_setting, cls).__new__(cls)
+        return cls._instance
+
+    def __init__(self, ui_file_path, device_paths, selected_device: int, main_window_instance=None):
+        if hasattr(self, '_initialized') and self._initialized:
+            return
         super(port_setting, self).__init__()
-        
+        self._initialized = True
+
         self.device_paths = device_paths
         # 检查 device_paths 是否为 None 或空
         if not self.device_paths:
@@ -30,6 +40,10 @@ class port_setting(QMainWindow):
         self.selected_device = selected_device
         self.load_ui(ui_file_path)
 
+        # 获取main_window实例句柄
+        self.main_window = main_window_instance
+        self.device = self.main_window.getDevices()[self.main_window.getUserChooseDevice()]
+
         #####################################
         # 获取按钮并连接信号
         #####################################
@@ -37,6 +51,7 @@ class port_setting(QMainWindow):
         self.dialog_button.accepted.connect(self.close_windows)
         self.dialog_button.helpRequested.connect(self.close_windows)
 
+        # 把端口存储到对象里，对象的内部方法完成端口的配置
         self.findChild(QPushButton, 'touch_set').clicked.connect(lambda: self.set_port_click('touch_select'))
         self.findChild(QPushButton, 'aime_set').clicked.connect(lambda: self.set_port_click('aime_select'))
         self.findChild(QPushButton, 'led_set').clicked.connect(lambda: self.set_port_click('led_select'))
@@ -60,67 +75,49 @@ class port_setting(QMainWindow):
         self.close()
 
 
-    def set_port_click(self,device):
+    def read_port_from_select(self, device):
         """
-        设置端口的事件
+        从选择的端口中读取端口号
         """
-        i = int(self.selected_device) - 1
-
         port_select_box = self.findChild(QComboBox, device)
-        port = "COM"+port_select_box.currentText()
-        # print("为", device, "设备配置", port, "端口")
-        if device == 'touch_select':
-            if not write_com_port_value(self.device_paths[i][0], port):
-                show_warning("port error", "Change port fail!")
-        elif device == 'aime_select':
-            if not write_com_port_value(self.device_paths[i][1], port):
-                show_warning("port error", "Change port fail!")
-        elif device == 'led_select':
-            if not write_com_port_value(self.device_paths[i][2], port):
-                show_warning("port error", "Change port fail!")
-        elif device == 'command_select':
-            if not write_com_port_value(self.device_paths[i][3], port):
-                show_warning("port error", "Change port fail!")
-        self.update_ports()
+        return port_select_box.currentText()
+
+
+    def set_port_click(self, device):
+        """
+        给指定设备设定端口
+        """
+
+        if self.device is None:
+            show_warning("device error", "Device Not Found!")
+            return
+        if not self.device.check_connect():
+            show_warning("device error", "Device Not Connected!")
+            return
+        # 获取当前选择的端口
+        port = self.read_port_from_select(self.device)
+        if port is None:
+            show_warning("port error", "Invalid Port Selected!")
+            return
+        self.device.set_port(self.device.get_port_type(), port)
 
 
     def refresh_port_click(self):
         """
-        新端口事件
+        刷新行为
         """
         self.update_ports()
 
 
     def update_ports(self):
         """
-        获取设备端口
+        刷新端口
         """
-        if self.selected_device == 1:
+        if self.device is None:
             show_warning("device error", "Device Not Found!")
             return
-        i = int(self.selected_device) - 1
-        touch_port = read_com_port_number(self.device_paths[i][0])[3:]
-        if touch_port is None:
-            show_warning("device error", "Cannot get touch device port!")
-        aime_port = read_com_port_number(self.device_paths[i][1])[3:]
-        if aime_port is None:
-            show_warning("device error", "Cannot get aime device port!")
-        led_port = read_com_port_number(self.device_paths[i][2])[3:]
-        if led_port is None:
-            show_warning("device error", "Cannot get led device port!")
-        command_port = read_com_port_number(self.device_paths[i][3])[3:]
-        if command_port is None:
-            show_warning("device error", "Cannot get command device port!")
+        self.device.get_port()
 
-        touch_port_box = self.findChild(QTextBrowser, 'touch_port')
-        aime_port_box = self.findChild(QTextBrowser, 'aime_port')
-        led_port_box = self.findChild(QTextBrowser, 'led_port')
-        command_port_box = self.findChild(QTextBrowser, 'command_port')
-
-        touch_port_box.setText(touch_port)
-        aime_port_box.setText(aime_port)
-        led_port_box.setText(led_port)
-        command_port_box.setText(command_port)
 
     #####################################
 

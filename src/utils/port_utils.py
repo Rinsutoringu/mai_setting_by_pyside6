@@ -94,6 +94,7 @@ def find_device_usb_path(vid, pid):
             device_serial[index].append("SYSTEM\\CurrentControlSet\\Enum\\USB\\VID_0CA3&PID_0021&MI_08\\" + parent_id + "&0008")
     return device_serial
 
+
 def read_com_port_number(reg_path):
     """
     :param reg_path: 设备注册表路径

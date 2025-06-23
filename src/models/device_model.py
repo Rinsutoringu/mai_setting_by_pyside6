@@ -64,17 +64,17 @@ class Device:
         """
         获取设备端口
         """
-        touch_port = read_com_port_number(self.device_path[0])[3:]
-        if touch_port is None:
+        self.touch_port = read_com_port_number(self.device_path[0])[3:]
+        if self.touch_port is None:
             show_warning("device error", "Cannot get touch device port!")
-        aime_port = read_com_port_number(self.device_path[0])[3:]
-        if aime_port is None:
+        self.aime_port = read_com_port_number(self.device_path[1])[3:]
+        if self.aime_port is None:
             show_warning("device error", "Cannot get aime device port!")
-        led_port = read_com_port_number(self.device_path[0])[3:]
-        if led_port is None:
+        self.led_port = read_com_port_number(self.device_path[2])[3:]
+        if self.led_port is None:
             show_warning("device error", "Cannot get led device port!")
-        command_port = read_com_port_number(self.device_path[0])[3:]
-        if command_port is None:
+        self.command_port = read_com_port_number(self.device_path[3])[3:]
+        if self.command_port is None:
             show_warning("device error", "Cannot get command device port!")
 
     def set_port(self, port_type, port_value):
@@ -82,15 +82,20 @@ class Device:
         更新注册表设备端口
         """
         if self.device_path:
+            port = "COM"+port_value
             if port_type == "touch":
-                write_com_port_value(self.device_path[0], f"COM{port_value}")
+                if not write_com_port_value(self.device_path[0], port):
+                    show_warning("port error", "Change touch port fail!")
                 self.touch_port = port_value
             elif port_type == "aime":
-                write_com_port_value(self.device_path[1], f"COM{port_value}")
+                if not write_com_port_value(self.device_path[1], port):
+                    show_warning("port error", "Change aime port fail!")
                 self.aime_port = port_value
             elif port_type == "led":
-                write_com_port_value(self.device_path[2], f"COM{port_value}")
+                if not write_com_port_value(self.device_path[2], port):
+                    show_warning("port error", "Change led port fail!")
                 self.led_port = port_value
             elif port_type == "command":
-                write_com_port_value(self.device_path[3], f"COM{port_value}")
+                if not write_com_port_value(self.device_path[3], port):
+                    show_warning("port error", "Change command port fail!")
                 self.command_port = port_value

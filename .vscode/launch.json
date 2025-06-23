@@ -12,9 +12,13 @@
             "name": "调试整个项目",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/Project/main.py", // 指定入口文件路径
+            "program": "${workspaceFolder}/src/main.py", // 指定入口文件路径
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}" // 设置工作目录为项目根目录
-        }
+            "cwd": "${workspaceFolder}", // 设置工作目录为项目根目录
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/src"
+            }
+        },
+        
     ]
 }

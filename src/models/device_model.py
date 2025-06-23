@@ -1,4 +1,4 @@
-from utils.port_utils import read_com_port_number
+from utils.port_utils import read_com_port_number, write_com_port_value
 from utils.warning import show_warning
 
 
@@ -23,7 +23,6 @@ class Device:
 
         # TODO 自动获取设备当前各设备端口
         if device_path:
-            self.update_port()
             self.get_port()
             self.check_connect()
 
@@ -41,7 +40,6 @@ class Device:
         self.aime_port = aime
         self.led_port = led
         self.command_port = command
-        self.update_port()
 
     def getPort(self, port_type):
         if port_type == "touch":
@@ -78,9 +76,21 @@ class Device:
         command_port = read_com_port_number(self.device_path[0])[3:]
         if command_port is None:
             show_warning("device error", "Cannot get command device port!")
-                
-    def update_port(self):
+
+    def set_port(self, port_type, port_value):
         """
         更新注册表设备端口
         """
-        # 添加设备端口更新逻辑
+        if self.device_path:
+            if port_type == "touch":
+                write_com_port_value(self.device_path[0], f"COM{port_value}")
+                self.touch_port = port_value
+            elif port_type == "aime":
+                write_com_port_value(self.device_path[1], f"COM{port_value}")
+                self.aime_port = port_value
+            elif port_type == "led":
+                write_com_port_value(self.device_path[2], f"COM{port_value}")
+                self.led_port = port_value
+            elif port_type == "command":
+                write_com_port_value(self.device_path[3], f"COM{port_value}")
+                self.command_port = port_value

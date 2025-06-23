@@ -155,10 +155,12 @@ if __name__ == "__main__":
     print("现在执行对", which_device+1, "号设备的更改")
 
     # 进一步查找有效的COM子设备
+    # device_paths[which_device]指的是当前选择的设备的所有子设备路径
     for device_path in device_paths[which_device]:
 
 
         # 确定当前的设备是否是一个有效的 COM 设备，如果是的话则返回其端口
+        # 读取当前 COM 端口号
         current_com_port = read_com_port_number(device_path)
         if current_com_port is None:
             print(f"{device_path} 不是一个有效的 COM 设备")

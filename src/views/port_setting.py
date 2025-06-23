@@ -70,16 +70,16 @@ class port_setting(QMainWindow):
         port = "COM"+port_select_box.currentText()
         # print("为", device, "设备配置", port, "端口")
         if device == 'touch_select':
-            if write_com_port_value(self.device_paths[i][0], port) == False:
+            if not write_com_port_value(self.device_paths[i][0], port):
                 show_warning("port error", "Change port fail!")
         elif device == 'aime_select':
-            if write_com_port_value(self.device_paths[i][1], port) == False:
+            if not write_com_port_value(self.device_paths[i][1], port):
                 show_warning("port error", "Change port fail!")
         elif device == 'led_select':
-            if write_com_port_value(self.device_paths[i][2], port) == False:
+            if not write_com_port_value(self.device_paths[i][2], port):
                 show_warning("port error", "Change port fail!")
         elif device == 'command_select':
-            if write_com_port_value(self.device_paths[i][3], port) == False:
+            if not write_com_port_value(self.device_paths[i][3], port):
                 show_warning("port error", "Change port fail!")
         self.update_ports()
 

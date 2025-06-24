@@ -11,10 +11,6 @@ class svgHandle:
                 self.svg_content = f.read()
 
     def changeSvgColor(self, label_name, target_color):
-        """
-        修改SVG字符串中指定 inkscape:label 的元素及其子元素的颜色。
-        每次变色都基于上一次的 svg_content。
-        """
         try:
             ns = {
                 'svg': 'http://www.w3.org/2000/svg',
@@ -41,9 +37,6 @@ class svgHandle:
             return self.svg_content
 
     def _set_fill_recursive(self, elem, target_color):
-        """
-        递归设置元素及其所有子元素的 fill 属性。
-        """
         tag = elem.tag.split('}')[-1]
         if tag in ['path', 'rect', 'polygon', 'ellipse', 'circle']:
             self.set_fill(elem, target_color)
@@ -51,9 +44,7 @@ class svgHandle:
             self._set_fill_recursive(child, target_color)
 
     def set_fill(self, elem, target_color):
-        # 直接设置fill属性
         elem.set('fill', target_color)
-        # 处理style属性
         style = elem.attrib.get('style')
         if style:
             styles = style.split(';')

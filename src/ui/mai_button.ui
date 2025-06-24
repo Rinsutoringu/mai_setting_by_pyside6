@@ -62,7 +62,7 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QGraphicsView" name="screenView">
+  <widget class="QGraphicsView" name="buttonview">
    <property name="geometry">
     <rect>
      <x>20</x>

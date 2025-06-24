@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
+from concurrent.futures import ThreadPoolExecutor
 
 class svgHandle:
+    _executor = ThreadPoolExecutor(max_workers=2)
 
     def __init__(self, svg_file_path=None):
         self.svg_content = ""
@@ -10,30 +12,43 @@ class svgHandle:
 
     def changeSvgColor(self, label_name, target_color):
         """
-        修改SVG字符串中指定 inkscape:label 的元素及其子元素的颜色（包括style属性中的fill），返回修改后的SVG字符串
-        :param label_name: inkscape:label 的值
-        :param target_color: 目标颜色（如 "#ff0000"）
-        :return: 修改后的SVG字符串
+        修改SVG字符串中指定 inkscape:label 的元素及其子元素的颜色。
+        每次变色都基于上一次的 svg_content。
         """
-        ns = {
-            'svg': 'http://www.w3.org/2000/svg',
-            'inkscape': 'http://www.inkscape.org/namespaces/inkscape'
-        }
-        ET.register_namespace('', ns['svg'])
-        ET.register_namespace('inkscape', ns['inkscape'])
+        try:
+            ns = {
+                'svg': 'http://www.w3.org/2000/svg',
+                'inkscape': 'http://www.inkscape.org/namespaces/inkscape'
+            }
+            ET.register_namespace('', ns['svg'])
+            ET.register_namespace('inkscape', ns['inkscape'])
 
-        root = ET.fromstring(self.svg_content)
-        # 查找 inkscape:label=label_name 的元素
-        for elem in root.iter():
-            label = elem.attrib.get('{http://www.inkscape.org/namespaces/inkscape}label')
-            if label == label_name:
-                for child in elem.iter():
-                    tag = child.tag.split('}')[-1]
-                    if tag in ['path', 'rect', 'polygon', 'ellipse', 'circle']:
-                        self.set_fill(child, target_color)
-                break
-        # 返回修改后的SVG字符串
-        return ET.tostring(root, encoding='utf-8', xml_declaration=True).decode('utf-8')
+            root = ET.fromstring(self.svg_content)
+            found = False
+            for elem in root.iter():
+                label = elem.attrib.get('{http://www.inkscape.org/namespaces/inkscape}label')
+                if label == label_name:
+                    self._set_fill_recursive(elem, target_color)
+                    found = True
+                    break
+            if not found:
+                print(f"[svgHandle] Label '{label_name}' not found in SVG.")
+            new_svg = ET.tostring(root, encoding='utf-8', xml_declaration=True).decode('utf-8')
+            self.svg_content = new_svg  # 更新为最新内容
+            return new_svg
+        except Exception as e:
+            print(f"[svgHandle] changeSvgColor error: {e}")
+            return self.svg_content
+
+    def _set_fill_recursive(self, elem, target_color):
+        """
+        递归设置元素及其所有子元素的 fill 属性。
+        """
+        tag = elem.tag.split('}')[-1]
+        if tag in ['path', 'rect', 'polygon', 'ellipse', 'circle']:
+            self.set_fill(elem, target_color)
+        for child in elem:
+            self._set_fill_recursive(child, target_color)
 
     def set_fill(self, elem, target_color):
         # 直接设置fill属性
@@ -53,13 +68,3 @@ class svgHandle:
             if not found:
                 new_styles.append(f'fill:{target_color}')
             elem.set('style', ';'.join(new_styles))
-
-
-
-# 用法示例
-if __name__ == "__main__":
-    svg_handler = svgHandle("d:/dev/orderProject/maiSetting/resources/drawing.svg")
-    new_svg = svg_handler.changeSvgColor("E8", "#00ff00")
-    # 可以直接传递 new_svg 给 QSvgRenderer.load(QByteArray(new_svg.encode("utf-8")))
-    with open("d:/dev/orderProject/maiSetting/resources/drawing_modified.svg", "w", encoding="utf-8") as f:
-        f.write(new_svg)

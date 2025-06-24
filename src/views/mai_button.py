@@ -6,9 +6,9 @@
 
 import sys
 import os
-from PySide6.QtCore import QFile, QIODevice
+from PySide6.QtCore import QFile, QIODevice, Qt
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox, QTextBrowser, QLabel, QGraphicsView
+from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QLabel, QGraphicsView
 from PySide6.QtSvgWidgets import QGraphicsSvgItem
 from PySide6.QtSvg import QSvgRenderer
 from PySide6.QtCore import QByteArray
@@ -16,6 +16,7 @@ from PySide6.QtWidgets import QGraphicsScene
 from utils.warning import show_warning
 from utils.string_utils import extract_device_number
 from utils.svghandle import svgHandle
+from PySide6.QtCore import QTimer
 
 class mai_button(QMainWindow):
     _instance = None
@@ -31,6 +32,8 @@ class mai_button(QMainWindow):
             return
         super(mai_button, self).__init__()
         self._initialized = True
+        
+        self.load_ui(ui_file_path)
 
         self.device_paths = device_paths
         # 检查 device_paths 是否为 None 或空
@@ -45,7 +48,7 @@ class mai_button(QMainWindow):
                 show_warning("Initialization Error", f"Device path at index {index} is invalid: {path}")
                 return
         self.selected_device = selected_device
-        self.load_ui(ui_file_path)
+        
 
         # 获取main_window实例句柄
         self.main_window = main_window_instance
@@ -60,6 +63,7 @@ class mai_button(QMainWindow):
             self.device = self.ConnectDevice[device_number-1]
 
         self.handler = svgHandle("resources//drawing.svg")
+
           # 示例调用，显示 E8 标签的绿色 SVG
         #####################################
         # 获取按钮并连接信号
@@ -67,7 +71,7 @@ class mai_button(QMainWindow):
         self.dialog_button = self.findChild(QDialogButtonBox, 'buttonBox')
         if self.dialog_button is None:
             show_warning("Initialization Error", "Dialog button not found!")
-        self.screen_view = self.findChild(QGraphicsView, 'screenView')
+        self.screen_view = self.findChild(QGraphicsView, 'buttonview')
         if self.screen_view is None:
             show_warning("Initialization Error", "Screen view not found!")
         self.testbutton = self.findChild(QPushButton, 'test123')
@@ -78,13 +82,13 @@ class mai_button(QMainWindow):
         self.dialog_button.accepted.connect(self.close_windows)
         self.dialog_button.rejected.connect(self.close_windows)
         self.dialog_button.helpRequested.connect(self.close_windows)
-        self.testbutton.clicked.connect(lambda: self.show_svg_on_screenview("E8", "#00ff00"))
+        self.testbutton.clicked.connect(self.test)
 
         #####################################
         # 界面逻辑
         #####################################
-        
-
+        self.svg_scene = QGraphicsScene()
+        self.screen_view.setScene(self.svg_scene)
         #####################################
 
 
@@ -92,21 +96,22 @@ class mai_button(QMainWindow):
     # 工具函数
     #####################################
     def show_svg_on_screenview(self, label_name, color):
-        # 用 svgHandle 修改 SVG
-        new_svg = self.handler.changeSvgColor(label_name, color)
-
-        # 创建 QSvgRenderer
-        renderer = QSvgRenderer(QByteArray(new_svg.encode("utf-8")))
-
-        # 创建 QGraphicsSvgItem 并设置 renderer
-        svg_item = QGraphicsSvgItem()
-        svg_item.setSharedRenderer(renderer)
-
-        # 创建场景并添加 item
-        scene = QGraphicsScene()
-        scene.addItem(svg_item)
-        self.screen_view.setScene(scene)
-        self.screen_view.show()
+        svg_path = "resources/drawing.svg"  # 或用绝对路径
+        try:
+            with open(svg_path, "r", encoding="utf-8") as f:
+                svg_content = f.read()
+            print("SVG内容长度:", len(svg_content))
+            print("SVG内容片段:", svg_content[:200])
+            renderer = QSvgRenderer(QByteArray(svg_content.encode("utf-8")))
+            print("renderer.isValid():", renderer.isValid())
+            svg_item = QGraphicsSvgItem()
+            svg_item.setSharedRenderer(renderer)
+            print("svg_item.boundingRect():", svg_item.boundingRect())
+            self.svg_scene.clear()
+            self.svg_scene.addItem(svg_item)
+            self.screen_view.show()
+        except Exception as e:
+            print("加载SVG文件异常：", e)
     #####################################
 
     #####################################
@@ -119,6 +124,15 @@ class mai_button(QMainWindow):
         """
         self.hide()
 
+    def test(self):
+        """
+        测试函数
+        """
+        print("测试函数被调用")
+        try:
+            QTimer.singleShot(100, lambda: self.show_svg_on_screenview("E8", "#00ff00"))
+        except Exception as e:
+            print("捕获到未处理异常：", e)
     #####################################
 
     def load_ui(self, ui_file_path):

@@ -1,6 +1,0 @@
-<RCC>
-  <qresource prefix="/icon">
-    <file>maitouch.svg</file>
-    <file alias="A1area">area.svg</file>
-  </qresource>
-</RCC>

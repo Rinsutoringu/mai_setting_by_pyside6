@@ -14,6 +14,8 @@ from models.device_model import Device
 
 # 其他窗口模块
 from .port_setting import port_setting
+from .mai_button import mai_button
+
 
 # 工具函数
 from utils.port_utils import find_device_usb_path
@@ -49,14 +51,14 @@ class main_window(QMainWindow):
 
         # 先初始化 selected_device，假设默认选第一个设备
         self.selected_device = 0
-        ##############################################
-        # 初始化子窗口
-        ##############################################
-        self.port_setting_window = port_setting("src/ui/port_setting.ui", self.device_paths, self.selected_device, main_window_instance=self)
+
+        self.userChooseDevice = 0
+
         ##############################################
         # 初始化按钮
         ##############################################
         self.port_setting = self.findChild(QPushButton, 'port_setting')
+        self.mai_button = self.findChild(QPushButton, 'Sensitivity')
         self.reconfirm_button = self.findChild(QPushButton, 'reconfirm_button')
         self.admin_button = self.findChild(QPushButton, 'admin_button')
         self.dialog_button = self.findChild(QDialogButtonBox, 'dialog_button')
@@ -65,6 +67,8 @@ class main_window(QMainWindow):
         # 事件绑定
         ##############################################
         self.port_setting.clicked.connect(self.open_port_setting)
+        self.mai_button.clicked.connect(self.open_mai_button)
+
         self.reconfirm_button.clicked.connect(self.reconfirm)
         self.admin_button.clicked.connect(self.request_admin_privileges)
         self.dialog_button.accepted.connect(self.close_windows)
@@ -74,6 +78,11 @@ class main_window(QMainWindow):
         self.is_admin()
         ##############################################
     
+        ##############################################
+        # 初始化子窗口
+        ##############################################
+        self.port_setting_window = port_setting("src/ui/port_setting.ui", self.device_paths, self.selected_device, main_window_instance=self)
+        self.mai_button_window = mai_button("src/ui/mai_button.ui", self.device_paths, self.selected_device, main_window_instance=self)
     ##############################################
     # 事件
     ##############################################
@@ -90,6 +99,12 @@ class main_window(QMainWindow):
         """
         self.port_setting_window.show()
 
+    def open_mai_button(self):
+        """
+        打开灵敏度设置窗口
+        """
+        self.mai_button_window.show()
+
     def refresh_device_selector(self):
         """
         为设备选择器添加设备下拉列表
@@ -105,6 +120,7 @@ class main_window(QMainWindow):
             if self.devices[i].check_connect():
                 # 提取设备关键信息
                 self.device_selector.addItem(f"Device {i + 1} ({self.devices[i].getDevicePath()[0][58:68]})")
+                print("发现设备")
             # else:
                 # 这玩意不该显示出来
                 # self.device_selector.addItem(f"设备 {i + 1}(未连接)")
@@ -146,6 +162,7 @@ class main_window(QMainWindow):
         # 经过有效性检查后，更新端口设置窗口的信息
         self.port_setting_window.selected_device = self.selected_device
         self.port_setting_window.update_ports()
+        self.userChooseDevice = self.selected_device
 
     def is_admin(self):
         """

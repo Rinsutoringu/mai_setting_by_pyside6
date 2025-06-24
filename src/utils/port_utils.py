@@ -78,9 +78,13 @@ def find_device_usb_path(vid, pid):
     device_serial = []
     usb_devices = usb.core.find(find_all=True, idVendor=input_vid, idProduct=input_pid)
     for index, usb_device in enumerate(usb_devices):
-        serial_number = usb.util.get_string(usb_device, usb_device.iSerialNumber)
-        device_serial.append([])
+        try:
+            serial_number = usb.util.get_string(usb_device, usb_device.iSerialNumber)
+        except Exception as e:
+            print(f"跳过无效设备: {e}")
+            continue  # 跳过无法读取序列号的设备
         
+        device_serial.append([])
         # 进行注册表字符串拼接，读取父设备编号
         main_device_path = "SYSTEM\\CurrentControlSet\\Enum\\USB\\VID_0CA3&PID_0021\\" + serial_number
         with reg.OpenKey(reg.HKEY_LOCAL_MACHINE, main_device_path) as key_path:
@@ -119,6 +123,8 @@ def write_com_port_value(registry_path, new_port_name):
     :param new_port_name: 设备待写入的新 COM 端口名
     :return: True or False
     """
+    # DEBUG
+    print(f"正在更改设备 {registry_path} 的 COM 端口为: {new_port_name}")
 
     parameters_path = f"{registry_path}\\Device Parameters"
     try:

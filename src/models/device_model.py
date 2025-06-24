@@ -1,5 +1,6 @@
 from utils.port_utils import read_com_port_number, write_com_port_value
 from utils.warning import show_warning
+from utils.check_competence import is_admin
 
 
 class Device:
@@ -64,16 +65,39 @@ class Device:
         """
         获取设备端口
         """
+        # DEBUG
+        print(f"Device path: {self.device_path}")
+
+        if not self.device_path:
+            show_warning("device error", "Device Path Not Found!")
+            return
+
         self.touch_port = read_com_port_number(self.device_path[0])[3:]
+
+        # DEBUG
+        print(f"Touch port: {self.touch_port}")
+
         if self.touch_port is None:
             show_warning("device error", "Cannot get touch device port!")
         self.aime_port = read_com_port_number(self.device_path[1])[3:]
+
+        # DEBUG
+        print(f"Aime port: {self.aime_port}")
+
         if self.aime_port is None:
             show_warning("device error", "Cannot get aime device port!")
         self.led_port = read_com_port_number(self.device_path[2])[3:]
+
+        # DEBUG
+        print(f"LED port: {self.led_port}")
+
         if self.led_port is None:
             show_warning("device error", "Cannot get led device port!")
         self.command_port = read_com_port_number(self.device_path[3])[3:]
+        
+        # DEBUG
+        print(f"Command port: {self.command_port}")
+
         if self.command_port is None:
             show_warning("device error", "Cannot get command device port!")
 
@@ -81,21 +105,25 @@ class Device:
         """
         更新注册表设备端口
         """
+        if not is_admin():
+            show_warning("admin error", "Please run this program as administrator!")
+            return
         if self.device_path:
             port = "COM"+port_value
-            if port_type == "touch":
+            if port_type == "touch_select":
                 if not write_com_port_value(self.device_path[0], port):
                     show_warning("port error", "Change touch port fail!")
                 self.touch_port = port_value
-            elif port_type == "aime":
+            elif port_type == "aime_select":
                 if not write_com_port_value(self.device_path[1], port):
                     show_warning("port error", "Change aime port fail!")
                 self.aime_port = port_value
-            elif port_type == "led":
+            elif port_type == "led_select":
                 if not write_com_port_value(self.device_path[2], port):
                     show_warning("port error", "Change led port fail!")
                 self.led_port = port_value
-            elif port_type == "command":
+            elif port_type == "command_select":
                 if not write_com_port_value(self.device_path[3], port):
                     show_warning("port error", "Change command port fail!")
                 self.command_port = port_value
+        show_warning("port success", port_type + " is set to " + port_value)

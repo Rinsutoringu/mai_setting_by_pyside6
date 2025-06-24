@@ -10,6 +10,7 @@ from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox, QTextBrowser, QLabel
 from utils.warning import show_warning
+from utils.string_utils import extract_device_number
 
 class port_setting(QMainWindow):
     _instance = None
@@ -42,7 +43,15 @@ class port_setting(QMainWindow):
 
         # 获取main_window实例句柄
         self.main_window = main_window_instance
-        self.device = self.main_window.getDevices()[self.main_window.getUserChooseDevice()]
+        self.ConnectDevice = self.main_window.getDevices()
+        
+        # 从main_window获取用户选择的设备
+        if self.ConnectDevice == {}:
+            show_warning("Initialization Error", "No connected devices found!")
+            self.device = None
+        else:
+            device_number = extract_device_number(self.main_window.getUserChooseDevice())
+            self.device = self.ConnectDevice[device_number-1]
 
         #####################################
         # 获取按钮并连接信号
@@ -83,7 +92,7 @@ class port_setting(QMainWindow):
         return port_select_box.currentText()
 
 
-    def set_port_click(self, device):
+    def set_port_click(self, port_type):
         """
         给指定设备设定端口
         """
@@ -95,11 +104,19 @@ class port_setting(QMainWindow):
             show_warning("device error", "Device Not Connected!")
             return
         # 获取当前选择的端口
-        port = self.read_port_from_select(self.device)
+        port = self.read_port_from_select(port_type)
+
+        # DEBUG
+        print(f"Selected port for {port_type}: {port}")
         if port is None:
             show_warning("port error", "Invalid Port Selected!")
             return
-        self.device.set_port(self.device.get_port_type(), port)
+        # 为指定串口设备设置端口
+        self.device.set_port(port_type, port)
+        self.update_ports()
+
+        # DEBUG
+        print(f"Setting {port_type} port to: {port}")
 
 
     def refresh_port_click(self):
@@ -118,6 +135,10 @@ class port_setting(QMainWindow):
             return
         self.device.get_port()
 
+        self.findChild(QTextBrowser, 'touch_port').setText(self.device.getPort('touch'))
+        self.findChild(QTextBrowser, 'aime_port').setText(self.device.getPort('aime'))
+        self.findChild(QTextBrowser, 'led_port').setText(self.device.getPort('led'))
+        self.findChild(QTextBrowser, 'command_port').setText(self.device.getPort('command'))
 
     #####################################
 

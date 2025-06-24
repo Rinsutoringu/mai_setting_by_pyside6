@@ -149,7 +149,6 @@ class mai_button(QMainWindow):
             
         except Exception as e:
             print(f"初始化SVG失败: {e}")
-            self.show_error_message("SVG初始化失败")
             self.svg_loaded = True
 
     def load_svg_from_file(self):
@@ -184,6 +183,7 @@ class mai_button(QMainWindow):
                     continue
                     
         print("未找到可用的SVG文件")
+        self.show_error_message(f"未找到可用的SVG文件")
         return False
 
     def create_svg_widget_from_file(self, svg_path):
@@ -287,9 +287,6 @@ class mai_button(QMainWindow):
                 else:
                     print("handler返回的SVG为空，使用备用方案")
             
-            # 如果没有handler或handler失败，显示带有指定颜色的备用SVG
-            self.show_custom_fallback_svg(label_name, color)
-            
         except Exception as e:
             print(f"显示SVG出错: {e}")
             self.show_error_message(f"显示SVG失败: {str(e)}")
@@ -313,52 +310,6 @@ class mai_button(QMainWindow):
     def test_button_5_clicked(self):
         """测试按钮点击事件"""
         self.show_svg_on_screenview("E1", "#F44336")
-
-    def show_custom_fallback_svg(self, label_name, color):
-        """显示带有指定标签和颜色的备用SVG"""
-        print(f"显示自定义备用SVG - 标签: {label_name}, 颜色: {color}")
-        
-        # 创建带有指定颜色的SVG内容
-        custom_svg = f'''<?xml version="1.0" encoding="UTF-8"?>
-<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:{color};stop-opacity:1" />
-      <stop offset="100%" style="stop-color:{self._darken_color(color)};stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  
-  <!-- 背景 -->
-  <rect width="400" height="300" fill="#f0f0f0" stroke="#ccc" stroke-width="2"/>
-  
-  <!-- 主按钮区域 (带有inkscape:label) -->
-  <g inkscape:label="{label_name}">
-    <!-- 主圆形按钮 -->
-    <circle cx="200" cy="150" r="80" fill="url(#grad1)" stroke="#333" stroke-width="3"/>
-    
-    <!-- 按钮内部装饰 -->
-    <circle cx="170" cy="120" r="4" fill="white" opacity="0.8"/>
-    <circle cx="230" cy="120" r="4" fill="white" opacity="0.8"/>
-    
-    <!-- 按钮状态指示器 -->
-    <rect x="180" y="200" width="40" height="8" rx="4" fill="{color}"/>
-  </g>
-  
-  <!-- 按钮文字 -->
-  <text x="200" y="160" text-anchor="middle" fill="white" font-size="18" font-family="Arial, sans-serif" font-weight="bold">{label_name}</text>
-  
-  <!-- 状态文字 -->
-  <text x="200" y="230" text-anchor="middle" fill="#666" font-size="12" font-family="Arial, sans-serif">激活状态</text>
-</svg>'''
-        
-        try:
-            # 调用display_custom_svg来显示SVG
-            self.display_custom_svg(custom_svg)
-            print("自定义备用SVG显示成功")
-            
-        except Exception as e:
-            print(f"显示自定义备用SVG失败: {e}")
-            self.show_error_message("SVG显示失败")
 
     def display_custom_svg(self, svg_content):
         """显示自定义SVG内容"""
@@ -413,7 +364,9 @@ class mai_button(QMainWindow):
                 svg_content = '<?xml version="1.0" encoding="UTF-8"?>\n' + svg_content
             
             if '<svg' not in svg_content:
+
                 raise Exception("SVG内容缺少svg标签")
+                
                 
             if '</svg>' not in svg_content:
                 svg_content += '</svg>'
@@ -431,14 +384,47 @@ class mai_button(QMainWindow):
                 
         except Exception as e:
             print(f"SVG验证过程出错: {e}")
+            self.show_error_message(f"SVG验证过程出错: {e}")
             return None
         
+    def show_error_message(self, message):
+        try:
+            self.clear_svg_container()
+            
+            # 创建错误标签
+            error_label = QLabel(f"❌ {message}\n\n点击测试按钮重试")
+            error_label.setAlignment(Qt.AlignCenter)
+            error_label.setStyleSheet("""
+                QLabel {
+                    background-color: #ffebee;
+                    border: 2px solid #f44336;
+                    border-radius: 8px;
+                    color: #d32f2f;
+                    font-size: 14px;
+                    padding: 20px;
+                    font-family: Arial, sans-serif;
+                }
+            """)
+            error_label.setMinimumSize(200, 100)
+            
+            # 添加到布局
+            layout = self.svg_container.layout()
+            if layout:
+                layout.addWidget(error_label)
+            
+            print(f"显示错误消息: {message}")
+
+        except Exception as e:
+            print(f"显示错误消息失败: {e}")
+            
+
     def load_ui(self, ui_file_path):    
         """
         加载UI
         """
         if not os.path.exists(ui_file_path):
             print(f"文件不存在: {ui_file_path}")
+
             sys.exit(-1)
 
         print("当前工作目录:", os.getcwd())

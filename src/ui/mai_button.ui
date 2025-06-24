@@ -137,7 +137,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">image: url(:/111/乌蒙背景.png);</string>
+    <string notr="true"/>
    </property>
    <widget class="QWidget" name="buttonview" native="true">
     <property name="geometry">
@@ -152,7 +152,7 @@
      <bool>false</bool>
     </property>
     <property name="styleSheet">
-     <string notr="true"/>
+     <string notr="true">background-color: rgb(201, 208, 255);</string>
     </property>
    </widget>
   </widget>

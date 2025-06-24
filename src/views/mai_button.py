@@ -65,15 +65,19 @@ class mai_button(QMainWindow):
         # 获取按钮并连接信号
         #####################################
         self.dialog_button = self.findChild(QDialogButtonBox, 'buttonBox')
+        if self.dialog_button is None:
+            show_warning("Initialization Error", "Dialog button not found!")
         self.screen_view = self.findChild(QGraphicsView, 'screenView')
+        if self.screen_view is None:
+            show_warning("Initialization Error", "Screen view not found!")
         self.testbutton = self.findChild(QPushButton, 'test123')
         if self.testbutton is None:
             show_warning("Initialization Error", "Test button not found!")
 
         # TODO 
-        self.dialog_button.accepted.connect(self.close)
-        self.dialog_button.rejected.connect(self.close)
-        self.dialog_button.helpRequested.connect(self.close)
+        self.dialog_button.accepted.connect(self.close_windows)
+        self.dialog_button.rejected.connect(self.close_windows)
+        self.dialog_button.helpRequested.connect(self.close_windows)
         self.testbutton.clicked.connect(lambda: self.show_svg_on_screenview("E8", "#00ff00"))
 
         #####################################
@@ -108,6 +112,12 @@ class mai_button(QMainWindow):
     #####################################
     #在这里写点击事件
     #####################################
+
+    def close_windows(self):
+        """
+        关闭窗口事件
+        """
+        self.hide()
 
     #####################################
 

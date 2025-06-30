@@ -16,6 +16,7 @@ function(add_arm_executable name)
 
 	add_executable(${name} ${ARG_SOURCES})
 
+	MESSAGE("!!!!!${ARG_TARGET}")
 	target_link_libraries(${name}
 			PRIVATE ${ARG_DEPENDS} ${ARG_TARGET} ${ARG_TARGET}_platform ${ARG_TARGET}_drivers)
 

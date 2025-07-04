@@ -3,3 +3,4 @@
 pyside6-essentials >= 6.2.0 ; python_version >= "3.9" and python_version < "3.13"
 shiboken6 >= 6.2.0 ; python_version >= "3.9" and python_version < "3.13"
 pyusb
+pyserial

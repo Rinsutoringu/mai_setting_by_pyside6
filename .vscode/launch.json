@@ -2,14 +2,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python 调试程序: 当前文件",
+            "name": "DEBUG Current File",
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal"
         },
         {
-            "name": "调试整个项目",
+            "name": "DEBUG Full Project",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/src/main.py", // 指定入口文件路径

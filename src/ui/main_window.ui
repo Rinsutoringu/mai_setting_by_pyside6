@@ -193,7 +193,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
       </rect>
      </property>
     </widget>
-    <widget class="QPushButton" name="sendcmd">
+    <widget class="QPushButton" name="sendcmdbutton">
      <property name="geometry">
       <rect>
        <x>210</x>

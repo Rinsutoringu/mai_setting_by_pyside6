@@ -56,6 +56,8 @@ class main_window(QMainWindow):
         self.userChooseDevice = 0
 
         self.serial_buffer = b''
+        self.sendcmd = b'\x53\xff\x00'  # 默认发送的命令
+        self.checkflag = False
 
         ##############################################
         # 初始化按钮
@@ -73,9 +75,8 @@ class main_window(QMainWindow):
         self.checkhandshake     = self.findChild(QCheckBox, 'checkhandshake')
 
         self.miniterminal       = self.findChild(QTextBrowser, 'textBrowser')
-        self.send_cmd           = self.findChild(QPushButton, 'sendcmd')
+        self.send_cmd           = self.findChild(QPushButton, 'sendcmdbutton')
         self.input_cmd          = self.findChild(QLineEdit, 'inputcmdbox')
-        print(self.input_cmd)
 
         ##############################################
         # 事件绑定
@@ -88,7 +89,7 @@ class main_window(QMainWindow):
         self.dialog_button.accepted.connect(self.close_windows)
         self.dialog_button.helpRequested.connect(self.close_windows)
         self.device_selector.currentIndexChanged.connect(self.on_device_selected)
-        self.send_cmd.clicked.connect(self.sendcmd)
+        self.send_cmd.clicked.connect(self.sendcmdevent)
         self.refresh_device_selector()
         self.is_admin()
         ##############################################
@@ -102,7 +103,7 @@ class main_window(QMainWindow):
     # 事件
     ##############################################
     
-    def sendcmd(self):
+    def sendcmdevent(self):
         """
         发送命令
         """
@@ -120,13 +121,27 @@ class main_window(QMainWindow):
             return
         deviceComm = device.getSerialComm()
 
-        if usrinput == "start":
-            deviceComm.send_bytes(b'\x53\x00\x00')
-            print(f"Sent command: {usrinput}")
-            self.input_cmd.clear()
+        if usrinput == "om serial":
+            send_bytes = (b'\x53\x00\x00')
+        elif usrinput == "om start":
+            send_bytes = (b'\x53\x10\x00')
+        elif usrinput == "om stop":
+            send_bytes = (b'\x53\x11\x00')
+        elif usrinput == "om data":
+            send_bytes = (b'\x53\x12\x00')
+        elif usrinput == "om sens":
+            send_bytes = (b'\x53\x13\x00')
+
         else :
             show_warning("error", "Unknown command!")
             self.input_cmd.clear()
+
+        deviceComm.send_bytes(send_bytes)
+        print(f"Sent command: {usrinput}")
+        self.sendcmd = send_bytes
+        self.input_cmd.clear()
+        self.checkflag = True
+
 
     def close_windows(self):
         """
@@ -273,8 +288,6 @@ class main_window(QMainWindow):
     
     def on_serial_data(self, data):
         # DEBUG
-        print(f"Received data: {data}")
-
         self.serial_buffer += data
         while b'\x53' in self.serial_buffer:
             idx = self.serial_buffer.find(b'\x53')
@@ -282,24 +295,37 @@ class main_window(QMainWindow):
             if idx == -1 or idx + 2 >= len(self.serial_buffer):
                 break
             # get command byte
-            command_byte = self.serial_buffer[(idx):(idx + 1)]
-            length_byte = self.serial_buffer[(idx + 1):(idx + 2)]
-            
+            command_byte = self.serial_buffer[(idx + 1):(idx + 2)]
+            length_byte = self.serial_buffer[(idx + 2):(idx + 3)]
+
             # 判断数据包长度是否正确
-            if length_byte != b'\x00':
-                # 如果长度不为0，说明有数据
-                data_length = int.from_bytes(length_byte, 'big')
-                if idx + 2 + data_length > len(self.serial_buffer):
-                    break
-                # 提取完整的数据包
-                pocket = self.serial_buffer[(idx):(idx + 2 + data_length)]
-                # 删除已处理的数据包
-                self.serial_buffer = self.serial_buffer[(idx + 2 + data_length):]
+            data_length = int.from_bytes(length_byte, 'big')
+            if idx + 2 + data_length > len(self.serial_buffer):
+                break
+            # 提取完整的数据包
+            pocket_byte = self.serial_buffer[(idx+3):(idx + 3 + data_length)]
 
-                
+            # DEBUG
+            full_byte = self.serial_buffer[(idx):(idx + 3 + data_length)]
+            # 删除已处理的数据包
+            self.serial_buffer = self.serial_buffer[(idx + 3 + data_length):]
 
 
-        self.miniterminal.append(f"<span style='color:blue;'>{data}</span>")
+            # 验证指令字段是否正确
+            print(f"DEBUG: checkflag={self.checkflag}, full_pack={full_byte.hex()}, sendcmd={self.sendcmd}, command_byte={command_byte.hex()}")
+
+            if self.checkflag and self.sendcmd is not None:
+                self.miniterminal.append("Checking command...")
+                if command_byte != self.sendcmd[1:2]:
+                    msg = f"Command check failed, expected: {self.sendcmd[1:2].hex()} but got: {command_byte.hex()}"
+                    self.miniterminal.append(msg)
+                else:
+                    self.miniterminal.append("Command check success.")
+                self.sendcmd = None  # 无论成功失败都立即清空
+                self.checkflag = False
+
+            print(f"Received command: {command_byte}, DataLength: {data_length}, Data: {pocket_byte}")
+            self.miniterminal.append(f"<span style='color:blue;'>{pocket_byte}</span>")
 
     ##############################################
 

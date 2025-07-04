@@ -135,7 +135,6 @@ class main_window(QMainWindow):
         获取用户选择
         """
         self.userChooseDevice = self.device_selector.itemText(index)
-        device_index = self.device_selector.currentIndex()
         # Start to connect to device
         if self.check_admin(): 
             self.checkadmin.isChecked()
@@ -157,7 +156,7 @@ class main_window(QMainWindow):
 
     def getUserChooseDevice(self):
         """
-        获取用户选择的设备
+        get user choose device index in devices
         :return: device Dict index
         """
         return self.device_selector.currentIndex()
@@ -167,7 +166,7 @@ class main_window(QMainWindow):
         更新端口设置窗口的信息
         :param selected_text: 选择的设备的文本
         """
-        if not selected_text :
+        if not selected_text:
 
             return
         self.selected_device = selected_text[3:]
@@ -225,8 +224,10 @@ class main_window(QMainWindow):
         :return: if device is connected, return device object, else return None
         """
         # try to connect to the device
-        deviceComm = self.devices[self.userChooseDevice].getSerialComm()
-        deviceComm.connect()
+        device = self.devices.get(self.getUserChooseDevice())
+        
+        # DEBUG
+        print(f"Selected device: {device}")
 
     ##############################################
 
@@ -238,7 +239,7 @@ class main_window(QMainWindow):
             print(f"文件不存在: {ui_file_path}")
             sys.exit(-1)
 
-        print("当前工作目录:", os.getcwd())
+        # print("当前工作目录:", os.getcwd())
         ui_file = QFile(ui_file_path)
 
         if not ui_file.open(QIODevice.ReadOnly):

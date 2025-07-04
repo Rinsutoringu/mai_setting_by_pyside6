@@ -149,7 +149,7 @@ class port_setting(QMainWindow):
             print(f"文件不存在: {ui_file_path}")
             sys.exit(-1)
 
-        print("当前工作目录:", os.getcwd())
+        # print("当前工作目录:", os.getcwd())
         ui_file = QFile(ui_file_path)
 
         if not ui_file.open(QIODevice.ReadOnly):

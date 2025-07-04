@@ -69,7 +69,7 @@ class Device:
         获取设备端口
         """
         # DEBUG
-        print(f"Device path: {self.device_path}")
+        # print(f"Device path: {self.device_path}")
 
         if not self.device_path:
             show_warning("device error", "Device Path Not Found!")
@@ -78,28 +78,28 @@ class Device:
         self.touch_port = read_com_port_number(self.device_path[0])[3:]
 
         # DEBUG
-        print(f"Touch port: {self.touch_port}")
+        # print(f"Touch port: {self.touch_port}")
 
         if self.touch_port is None:
             show_warning("device error", "Cannot get touch device port!")
         self.aime_port = read_com_port_number(self.device_path[1])[3:]
 
         # DEBUG
-        print(f"Aime port: {self.aime_port}")
+        # print(f"Aime port: {self.aime_port}")
 
         if self.aime_port is None:
             show_warning("device error", "Cannot get aime device port!")
         self.led_port = read_com_port_number(self.device_path[2])[3:]
 
         # DEBUG
-        print(f"LED port: {self.led_port}")
+        # print(f"LED port: {self.led_port}")
 
         if self.led_port is None:
             show_warning("device error", "Cannot get led device port!")
         self.command_port = read_com_port_number(self.device_path[3])[3:]
         
         # DEBUG
-        print(f"Command port: {self.command_port}")
+        # print(f"Command port: {self.command_port}")
 
         if self.command_port is None:
             show_warning("device error", "Cannot get command device port!")

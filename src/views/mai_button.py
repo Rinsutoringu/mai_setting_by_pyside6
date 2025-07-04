@@ -141,7 +141,7 @@ class mai_button(QMainWindow):
         if self.svg_loaded or not self.svg_container:
             return
             
-        print("开始初始化SVG")
+        # print("开始初始化SVG")
         try:
             self.load_svg_from_file()
             self.svg_loaded = True
@@ -152,7 +152,7 @@ class mai_button(QMainWindow):
 
     def load_svg_from_file(self):
         """从文件加载SVG"""
-        print("尝试从文件加载SVG")
+        # print("尝试从文件加载SVG")
         
         # 构建可能的SVG文件路径
         base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -164,10 +164,10 @@ class mai_button(QMainWindow):
         
         for svg_path in svg_paths:
             svg_path = os.path.normpath(svg_path)
-            print(f"检查路径: {svg_path}")
+            # print(f"检查路径: {svg_path}")
             
             if os.path.exists(svg_path):
-                print(f"找到SVG文件: {svg_path}")
+                # print(f"找到SVG文件: {svg_path}")
                 try:
                     # 验证SVG文件
                     renderer = QSvgRenderer(svg_path)
@@ -195,7 +195,7 @@ class mai_button(QMainWindow):
             self.svg_widget = QSvgWidget(svg_path)
             self.setup_svg_widget()
             
-            print(f"从文件创建SVG widget成功: {svg_path}")
+            # print(f"从文件创建SVG widget成功: {svg_path}")
             
         except Exception as e:
             print(f"从文件创建SVG widget失败: {e}")
@@ -215,7 +215,7 @@ class mai_button(QMainWindow):
         if layout:
             layout.addWidget(self.svg_widget)
         
-        print("SVG widget设置完成")
+        # print("SVG widget设置完成")
 
     def clear_svg_container(self):
         """清理SVG容器"""
@@ -426,7 +426,7 @@ class mai_button(QMainWindow):
 
             sys.exit(-1)
 
-        print("当前工作目录:", os.getcwd())
+        # print("当前工作目录:", os.getcwd())
         ui_file = QFile(ui_file_path)
 
         if not ui_file.open(QIODevice.ReadOnly):

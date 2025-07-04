@@ -50,8 +50,7 @@ class port_setting(QMainWindow):
             show_warning("Initialization Error", "No connected devices found!")
             self.device = None
         else:
-            device_number = extract_device_number(self.main_window.getUserChooseDevice())
-            self.device = self.ConnectDevice[device_number-1]
+            self.device = self.ConnectDevice[self.main_window.getUserChooseDevice()]
 
         #####################################
         # 获取按钮并连接信号

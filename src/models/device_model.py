@@ -1,6 +1,7 @@
 from utils.port_utils import read_com_port_number, write_com_port_value
 from utils.warning import show_warning
-from utils.check_competence import is_admin
+from utils.serial_utils import SerialCommunicator
+
 
 
 class Device:
@@ -21,6 +22,8 @@ class Device:
         self.command_port = command_port
         # 连接状态
         self.isConnect = False
+        # serial comm object
+        self.serial_comm = SerialCommunicator()  # 用于保存串口连接对象
 
         # TODO 自动获取设备当前各设备端口
         if device_path:
@@ -105,25 +108,32 @@ class Device:
         """
         更新注册表设备端口
         """
-        if not is_admin():
-            show_warning("admin error", "Please run this program as administrator!")
-            return
         if self.device_path:
             port = "COM"+port_value
             if port_type == "touch_select":
                 if not write_com_port_value(self.device_path[0], port):
                     show_warning("port error", "Change touch port fail!")
+                    return
                 self.touch_port = port_value
             elif port_type == "aime_select":
                 if not write_com_port_value(self.device_path[1], port):
                     show_warning("port error", "Change aime port fail!")
+                    return
                 self.aime_port = port_value
             elif port_type == "led_select":
                 if not write_com_port_value(self.device_path[2], port):
                     show_warning("port error", "Change led port fail!")
+                    return
                 self.led_port = port_value
             elif port_type == "command_select":
                 if not write_com_port_value(self.device_path[3], port):
                     show_warning("port error", "Change command port fail!")
+                    return
                 self.command_port = port_value
         show_warning("port success", port_type + " is set to " + port_value)
+
+    def setSerialComm(self, serial_comm):
+        self.serial_comm = serial_comm
+
+    def getSerialComm(self):
+        return self.serial_comm

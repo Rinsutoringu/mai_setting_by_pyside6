@@ -7,7 +7,7 @@ import os
 import ctypes
 from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox
+from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox, QCheckBox
 
 # 导入设备模型
 from models.device_model import Device
@@ -47,6 +47,7 @@ class main_window(QMainWindow):
         self.device_paths = find_device_usb_path(self.vid, self.pid)
         if self.device_paths is None:
             show_warning("error", "No device found!")
+        # devices 是一个字典，键为设备索引，值为 Device 实例
         self.devices = {}
 
         # 先初始化 selected_device，假设默认选第一个设备
@@ -63,6 +64,12 @@ class main_window(QMainWindow):
         self.admin_button = self.findChild(QPushButton, 'admin_button')
         self.dialog_button = self.findChild(QDialogButtonBox, 'dialog_button')
         self.device_selector = self.findChild(QComboBox, 'device_selector')
+
+        self.checkadmin = self.findChild(QCheckBox, 'checkadmin')
+        self.checkdevice = self.findChild(QCheckBox, 'checkdevice')
+        self.checklink = self.findChild(QCheckBox, 'checklink')
+        self.checkhandshake = self.findChild(QCheckBox, 'checkhandshake')
+
         ##############################################
         # 事件绑定
         ##############################################
@@ -114,6 +121,7 @@ class main_window(QMainWindow):
         self.device_selector.clear()
 
         # 根据二维数组的列数，动态生成下拉列表
+
         # device_paths是一个二维数组，列数为识别到的合法设备数量，行为每个串口子设备的注册表路径
         for i in range(len(self.device_paths)):
             self.devices[i] = Device(device_path=self.device_paths[i])
@@ -121,15 +129,23 @@ class main_window(QMainWindow):
                 # 提取设备关键信息
                 self.device_selector.addItem(f"Device {i + 1} ({self.devices[i].getDevicePath()[0][58:68]})")
                 print("发现设备")
-            # else:
-                # 这玩意不该显示出来
-                # self.device_selector.addItem(f"设备 {i + 1}(未连接)")
 
     def on_device_selected(self, index):
         """
         获取用户选择
         """
         self.userChooseDevice = self.device_selector.itemText(index)
+        device_index = self.device_selector.currentIndex()
+        # Start to connect to device
+        if self.check_admin(): 
+            self.checkadmin.isChecked()
+        if self.check_device():
+            self.checkdevice.isChecked()
+        # if check_link():
+        #     self.checklink.isChecked()
+        # if check_handshake():
+        #     self.checkhandshake.isChecked()
+
         # self.update_port_setting(self.device_selector.itemText(index))
 
     def reconfirm(self):
@@ -142,9 +158,9 @@ class main_window(QMainWindow):
     def getUserChooseDevice(self):
         """
         获取用户选择的设备
-        :return: 用户选择的设备文本
+        :return: device Dict index
         """
-        return self.userChooseDevice
+        return self.device_selector.currentIndex()
 
     def update_port_setting(self, selected_text):
         """
@@ -168,18 +184,18 @@ class main_window(QMainWindow):
         """
         验证当前用户是否是管理员
         :return: 不是返回False, 是返回True
-        """
-        if ctypes.windll.shell32.IsUserAnAdmin() == 0:
+        """ 
+        if not self.check_admin():
             return False
         self.admin_button.setText("Admin Active !")
         self.admin_button.setStyleSheet("color: rgb(0, 128, 0)")
         return True
-            
+
     def request_admin_privileges(self):
         """
         请求管理员权限
         """
-        if self.is_admin() == True:
+        if self.is_admin():
             show_warning("Hey!", "Escalated already!")
         else:
             ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, ' '.join(sys.argv), None, 0)
@@ -191,6 +207,26 @@ class main_window(QMainWindow):
         :return: 设备列表
         """
         return self.devices
+
+
+    def check_admin(self):
+        """
+        验证当前用户是否是管理员
+        :return: 不是返回False, 是返回True
+        """
+        if ctypes.windll.shell32.IsUserAnAdmin() == 0:
+            return False
+        return True
+    
+
+    def check_device(self):
+        """
+        检查设备是否连接
+        :return: if device is connected, return device object, else return None
+        """
+        # try to connect to the device
+        deviceComm = self.devices[self.userChooseDevice].getSerialComm()
+        deviceComm.connect()
 
     ##############################################
 

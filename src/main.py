@@ -5,7 +5,6 @@
 # @Software: VScode
 
 import sys
-import traceback
 from PySide6.QtWidgets import QApplication
 from views.main_window import main_window
 

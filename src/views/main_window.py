@@ -15,7 +15,7 @@ from models.command_model import CommandData
 
 # 其他窗口模块
 from .port_setting import port_setting
-from .mai_button import mai_button
+from .mai_button.mai_button import mai_button
 
 
 # 工具函数
@@ -101,7 +101,7 @@ class main_window(QMainWindow):
         # 初始化子窗口
         ##############################################
         self.port_setting_window    = port_setting("src/ui/port_setting.ui", self.device_paths, self.selected_device, main_window_instance=self)
-        self.mai_button_window      = mai_button("src/ui/mai_button.ui", self.device_paths, self.selected_device, main_window_instance=self)
+        self.mai_button_window      = mai_button("src/ui/mai_button.ui", self.device_paths, self.selected_device, self.command_data, main_window_instance=self)
     ##############################################
     # 事件
     ##############################################
@@ -313,7 +313,7 @@ class main_window(QMainWindow):
             self.serial_buffer = self.serial_buffer[(idx + 3 + self.command_data.getSize()):]
 
             # 验证指令字段是否正确
-            print(self.command_data)
+            # print(self.command_data)
 
 
             if self.checkflag and self.sendcmd is not None:

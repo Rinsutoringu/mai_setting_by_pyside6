@@ -32,9 +32,9 @@ class CommandData:
 
     def setParams(self, command_params):
         self.command_params = command_params
-        print(f"DEBUG: CommandData.setParams called with {command_params}")
+        # print(f"DEBUG: CommandData.setParams called with {command_params}")
         if self.command_id == b'\x12':
-            print("DEBUG: Command ID is 0x12, processing button status matrix.")
+            # print("DEBUG: Command ID is 0x12, processing button status matrix.")
             if not self.command_params or len(self.command_params) < 8:
                 return [[0]*8 for _ in range(8)]
             matrix = []
@@ -56,12 +56,6 @@ class CommandData:
 
     def getSize(self):
         return self.command_size
-
-    def setButtonStatus(self, button_name, status):
-        if button_name in self.buttonStatus:
-            self.buttonStatus[button_name] = status
-        else:
-            raise ValueError(f"Button {button_name} does not exist in command data.")
         
 
     def getButtonBitsMatrix(self):

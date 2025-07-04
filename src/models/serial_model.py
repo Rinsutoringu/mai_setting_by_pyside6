@@ -22,10 +22,11 @@ class SerialCommunicator:
         self.data_callback: Optional[Callable] = None
         self.logger = logging.getLogger(__name__)
 
-        logging.basicConfig(
-            level=logging.DEBUG,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        )
+        # DEBUG
+        # logging.basicConfig(
+        #     level=logging.DEBUG,
+        #     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        # )
 
     def __repr__(self):
         return f"SerialCommunicator(is_connected={self.is_connected}, is_listening={self.is_listening}, serial_port={self.serial_port}, receive_queue_size={self.receive_queue.qsize()})"

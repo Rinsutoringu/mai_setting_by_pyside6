@@ -9,12 +9,14 @@ import os
 from PySide6.QtCore import QFile, QIODevice, Qt, QTimer, QByteArray
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import (QMainWindow, QPushButton, QDialogButtonBox, QLabel, 
-                               QWidget, QVBoxLayout, QHBoxLayout)
+                               QWidget, QVBoxLayout)
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtSvg import QSvgRenderer
+from views.mai_button.ButtonStatusWorker import ButtonStatusWorker
 from utils.warning import show_warning
-from utils.string_utils import extract_device_number
 from utils.svghandle import svgHandle
+
+
 
 class mai_button(QMainWindow):
     _instance = None
@@ -24,7 +26,7 @@ class mai_button(QMainWindow):
             cls._instance = super(mai_button, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, ui_file_path, device_paths, selected_device: int, main_window_instance=None):
+    def __init__(self, ui_file_path, device_paths, selected_device: int, command_data, main_window_instance=None):
         if hasattr(self, '_initialized') and self._initialized:
             return
         super(mai_button, self).__init__()
@@ -37,6 +39,7 @@ class mai_button(QMainWindow):
         self.load_ui(ui_file_path)
 
         self.device_paths = device_paths
+        self.command_data = command_data
         # 检查 device_paths 是否为 None 或空
         if not self.device_paths:
             show_warning("Initialization Error", "Device paths are invalid or empty!")
@@ -104,11 +107,55 @@ class mai_button(QMainWindow):
         QTimer.singleShot(200, self.initialize_svg)
         #####################################
 
+        self.status_worker = ButtonStatusWorker(self.command_data)
+        self.status_worker.status_changed.connect(self.on_button_status_changed)
+        self.status_worker.start()
+
+        self.oldcolor   = "#a3c4ff"
+        self.A_newcolor = "#4CAF50"
+        self.B_newcolor = "#2196F3"
+        self.C_newcolor = "#FF9800"
+        self.D_newcolor = "#9C27B0"
+        self.E_newcolor = "#F44336"
+
+
+    def on_button_status_changed(self):
+        """
+        后台线程信号回调，根据按钮状态渲染SVG。
+        只对状态发生变化的按钮进行渲染，提高效率。
+        """
+        print("按钮状态更新，重新渲染SVG")
+        matrix = self.command_data.getButtonBitsMatrix()
+        row_info = [
+            ("A", self.A_newcolor, 8),
+            ("B", self.B_newcolor, 8),
+            ("C", self.C_newcolor, 2),
+            ("D", self.D_newcolor, 8),
+            ("E", self.E_newcolor, 8),
+        ]
+        # 用于记录上一次的按钮状态
+        if not hasattr(self, "_last_matrix"):
+            self._last_matrix = [[None]*8 for _ in range(5)]
+        for row_idx, (prefix, color, count) in enumerate(row_info):
+            for col in range(count):
+                is_pressed = matrix[row_idx][col]
+                if self._last_matrix[row_idx][col] != is_pressed:
+                    label = f"{prefix}{col+1}"
+                    self.show_svg_on_screenview(label, color if is_pressed else self.oldcolor)
+                    self._last_matrix[row_idx][col] = is_pressed
+
+
     def close_windows(self):
         """
         关闭窗口事件
         """
         self.close()
+
+    def closeEvent(self, event):
+        if hasattr(self, 'status_worker'):
+            self.status_worker.stop()
+            self.status_worker.wait()
+        super().closeEvent(event)
 
     def setup_svg_container(self):
         """设置SVG容器"""

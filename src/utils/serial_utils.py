@@ -21,7 +21,15 @@ class SerialCommunicator:
         self.receive_queue = Queue()
         self.data_callback: Optional[Callable] = None
         self.logger = logging.getLogger(__name__)
-        
+
+        logging.basicConfig(
+            level=logging.DEBUG,
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        )
+
+    def __repr__(self):
+        return f"SerialCommunicator(is_connected={self.is_connected}, is_listening={self.is_listening}, serial_port={self.serial_port}, receive_queue_size={self.receive_queue.qsize()})"
+
     def get_available_ports(self) -> List[str]:
         """
         获取可用的串口列表
@@ -235,17 +243,11 @@ class SerialCommunicator:
                 if self.serial_port and self.serial_port.in_waiting > 0:
                     data = self.serial_port.read(self.serial_port.in_waiting)
                     if data:
-                        decoded_data = data.decode('utf-8', errors='ignore').strip()
-                        if decoded_data:
-                            # 添加到队列
-                            self.receive_queue.put(decoded_data)
-                            
-                            # 调用回调函数
-                            if self.data_callback:
-                                try:
-                                    self.data_callback(decoded_data)
-                                except Exception as e:
-                                    self.logger.error(f"回调函数执行错误: {e}")
+                        if self.data_callback:
+                            try:
+                                self.data_callback(data)
+                            except Exception as e:
+                                self.logger.error(f"回调函数执行错误: {e}")
                 
                 time.sleep(0.01)  # 避免过度占用CPU
                 

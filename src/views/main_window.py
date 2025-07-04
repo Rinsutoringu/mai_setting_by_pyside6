@@ -7,7 +7,7 @@ import os
 import ctypes
 from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox, QCheckBox
+from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox, QCheckBox, QTextBrowser, QLineEdit
 
 # 导入设备模型
 from models.device_model import Device
@@ -55,20 +55,27 @@ class main_window(QMainWindow):
 
         self.userChooseDevice = 0
 
+        self.serial_buffer = b''
+
         ##############################################
         # 初始化按钮
         ##############################################
-        self.port_setting = self.findChild(QPushButton, 'port_setting')
-        self.mai_button = self.findChild(QPushButton, 'Sensitivity')
-        self.reconfirm_button = self.findChild(QPushButton, 'reconfirm_button')
-        self.admin_button = self.findChild(QPushButton, 'admin_button')
-        self.dialog_button = self.findChild(QDialogButtonBox, 'dialog_button')
-        self.device_selector = self.findChild(QComboBox, 'device_selector')
+        self.port_setting       = self.findChild(QPushButton, 'port_setting')
+        self.mai_button         = self.findChild(QPushButton, 'Sensitivity')
+        self.reconfirm_button   = self.findChild(QPushButton, 'reconfirm_button')
+        self.admin_button       = self.findChild(QPushButton, 'admin_button')
+        self.dialog_button      = self.findChild(QDialogButtonBox, 'dialog_button')
+        self.device_selector    = self.findChild(QComboBox, 'device_selector')
 
-        self.checkadmin = self.findChild(QCheckBox, 'checkadmin')
-        self.checkdevice = self.findChild(QCheckBox, 'checkdevice')
-        self.checklink = self.findChild(QCheckBox, 'checklink')
-        self.checkhandshake = self.findChild(QCheckBox, 'checkhandshake')
+        self.checkadmin         = self.findChild(QCheckBox, 'checkadmin')
+        self.checkdevice        = self.findChild(QCheckBox, 'checkdevice')
+        self.checklink          = self.findChild(QCheckBox, 'checklink')
+        self.checkhandshake     = self.findChild(QCheckBox, 'checkhandshake')
+
+        self.miniterminal       = self.findChild(QTextBrowser, 'textBrowser')
+        self.send_cmd           = self.findChild(QPushButton, 'sendcmd')
+        self.input_cmd          = self.findChild(QLineEdit, 'inputcmdbox')
+        print(self.input_cmd)
 
         ##############################################
         # 事件绑定
@@ -76,11 +83,12 @@ class main_window(QMainWindow):
         self.port_setting.clicked.connect(self.open_port_setting)
         self.mai_button.clicked.connect(self.open_mai_button)
 
-        self.reconfirm_button.clicked.connect(self.reconfirm)
+        self.reconfirm_button.clicked.connect(self.on_device_selected)
         self.admin_button.clicked.connect(self.request_admin_privileges)
         self.dialog_button.accepted.connect(self.close_windows)
         self.dialog_button.helpRequested.connect(self.close_windows)
         self.device_selector.currentIndexChanged.connect(self.on_device_selected)
+        self.send_cmd.clicked.connect(self.sendcmd)
         self.refresh_device_selector()
         self.is_admin()
         ##############################################
@@ -88,12 +96,38 @@ class main_window(QMainWindow):
         ##############################################
         # 初始化子窗口
         ##############################################
-        self.port_setting_window = port_setting("src/ui/port_setting.ui", self.device_paths, self.selected_device, main_window_instance=self)
-        self.mai_button_window = mai_button("src/ui/mai_button.ui", self.device_paths, self.selected_device, main_window_instance=self)
+        self.port_setting_window    = port_setting("src/ui/port_setting.ui", self.device_paths, self.selected_device, main_window_instance=self)
+        self.mai_button_window      = mai_button("src/ui/mai_button.ui", self.device_paths, self.selected_device, main_window_instance=self)
     ##############################################
     # 事件
     ##############################################
     
+    def sendcmd(self):
+        """
+        发送命令
+        """
+
+        # 获取用户输入的命令
+        usrinput = self.input_cmd.text()
+        if not usrinput:
+            show_warning("error", "Input command is empty!")
+            return
+
+        # 获取发送句柄
+        device = self.devices.get(self.getUserChooseDevice())
+        if device is None:
+            show_warning("error", "No device selected!")
+            return
+        deviceComm = device.getSerialComm()
+
+        if usrinput == "start":
+            deviceComm.send_bytes(b'\x53\x00\x00')
+            print(f"Sent command: {usrinput}")
+            self.input_cmd.clear()
+        else :
+            show_warning("error", "Unknown command!")
+            self.input_cmd.clear()
+
     def close_windows(self):
         """
         关闭窗口
@@ -135,24 +169,20 @@ class main_window(QMainWindow):
         获取用户选择
         """
         self.userChooseDevice = self.device_selector.itemText(index)
+        if not self.userChooseDevice:
+            return
         # Start to connect to device
         if self.check_admin(): 
-            self.checkadmin.isChecked()
+            self.checkadmin.setChecked(True)
         if self.check_device():
-            self.checkdevice.isChecked()
+            self.checkdevice.setChecked(True)
         # if check_link():
-        #     self.checklink.isChecked()
+        #     self.checklink.setChecked(True)
         # if check_handshake():
-        #     self.checkhandshake.isChecked()
+        #     self.checkhandshake.setChecked(True)
+
 
         # self.update_port_setting(self.device_selector.itemText(index))
-
-    def reconfirm(self):
-        """
-        再次确认事件
-        """
-        self.userChooseDevice =  self.device_selector.currentText()
-        # self.update_port_setting(self.device_selector.currentText())
 
     def getUserChooseDevice(self):
         """
@@ -225,9 +255,39 @@ class main_window(QMainWindow):
         """
         # try to connect to the device
         device = self.devices.get(self.getUserChooseDevice())
-        
+        deviceComm = device.getSerialComm()
+
+        port = "COM"+device.getPort("command")
+
+        deviceComm.connect(port=port, baudrate=9600, timeout=0.1, bytesize=8, parity='N', stopbits=1)
+        device.setConnStatus(True)
+
+        deviceComm.start_listening(callback=self.on_serial_data)
+    
         # DEBUG
         print(f"Selected device: {device}")
+        # print(f"Selected deviceComm: {deviceComm}")
+        print("Device connected, in port "+ port)
+
+        return True
+    
+    def on_serial_data(self, data):
+        # DEBUG
+        print(f"Received data: {data}")
+
+        self.serial_buffer += data
+        while b'\x53' in self.serial_buffer:
+            idx = self.serial_buffer.find(b'\x53')
+            # Check if idx is -1 or the command is received
+            if idx == -1 or idx + 2 >= len(self.serial_buffer):
+                break
+            # get command byte
+            command_byte = self.serial_buffer[idx:idx + 1]
+            length_byte = self.serial_buffer[idx + 1:idx + 2]
+
+
+
+        self.miniterminal.append(f"<span style='color:blue;'>{data}</span>")
 
     ##############################################
 

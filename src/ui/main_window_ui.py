@@ -85,12 +85,12 @@ class Ui_Form(object):
 
         self.verticalLayout_2.addWidget(self.pushButton_1_3)
 
-        self.lineEdit = QLineEdit(self.tab)
-        self.lineEdit.setObjectName(u"lineEdit")
-        self.lineEdit.setGeometry(QRect(20, 170, 191, 21))
-        self.pushButton = QPushButton(self.tab)
-        self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setGeometry(QRect(210, 163, 41, 31))
+        self.inputcmdbox = QLineEdit(self.tab)
+        self.inputcmdbox.setObjectName(u"inputcmdbox")
+        self.inputcmdbox.setGeometry(QRect(20, 170, 191, 21))
+        self.sendcmd = QPushButton(self.tab)
+        self.sendcmd.setObjectName(u"sendcmd")
+        self.sendcmd.setGeometry(QRect(210, 163, 41, 31))
         self.tabWidget.addTab(self.tab, "")
         self.tab_2 = QWidget()
         self.tab_2.setObjectName(u"tab_2")
@@ -176,14 +176,12 @@ class Ui_Form(object):
 "li.unchecked::marker { content: \"\\2610\"; }\n"
 "li.checked::marker { content: \"\\2612\"; }\n"
 "</style></head><body style=\" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Connect Success !</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Fail to Connect</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
         self.groupBox_6.setTitle(QCoreApplication.translate("Form", u"Settings", None))
         self.port_setting.setText(QCoreApplication.translate("Form", u"Port", None))
         self.Sensitivity.setText(QCoreApplication.translate("Form", u"Sensitivity", None))
         self.pushButton_1_3.setText(QCoreApplication.translate("Form", u"Overload", None))
-        self.pushButton.setText(QCoreApplication.translate("Form", u"Sent", None))
+        self.sendcmd.setText(QCoreApplication.translate("Form", u"Sent", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QCoreApplication.translate("Form", u"Tab 1", None))
         self.groupBox_7.setTitle(QCoreApplication.translate("Form", u"Device Select", None))
         self.radioButton.setText(QCoreApplication.translate("Form", u"USB (Defult)", None))

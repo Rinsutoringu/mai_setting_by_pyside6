@@ -182,7 +182,7 @@ class mai_button(QMainWindow):
                     continue
                     
         print("未找到可用的SVG文件")
-        self.show_error_message(f"未找到可用的SVG文件")
+        self.show_error_message("未找到可用的SVG文件")
         return False
 
     def create_svg_widget_from_file(self, svg_path):
@@ -281,10 +281,8 @@ class mai_button(QMainWindow):
                 if modified_svg:
                     # TODO 展示新的SVG，此时SVG应该在内存里
                     self.display_custom_svg(modified_svg)
-                    print(f"使用handler显示SVG成功 - 标签: {label_name}, 颜色: {color}")
+                    # print(f"使用handler显示SVG成功 - 标签: {label_name}, 颜色: {color}")
                     return
-                else:
-                    print("handler返回的SVG为空，使用备用方案")
             
         except Exception as e:
             print(f"显示SVG出错: {e}")
@@ -308,12 +306,13 @@ class mai_button(QMainWindow):
 
     def test_button_5_clicked(self):
         """测试按钮点击事件"""
+        self.handler.changeSvgNumber("E5", 20)
         self.show_svg_on_screenview("E1", "#F44336")
 
     def display_custom_svg(self, svg_content):
         """显示自定义SVG内容"""
         try:
-            print(f"准备显示SVG，内容长度: {len(svg_content)}")
+            # print(f"准备显示SVG，内容长度: {len(svg_content)}")
             
             # 清理旧的widget
             self.clear_svg_container()
@@ -332,19 +331,14 @@ class mai_button(QMainWindow):
                 raise Exception("SVG内容格式无效")
             
             # 加载SVG内容到widget
-            if self.svg_widget.load(svg_bytes):
+
+            self.svg_widget.renderer().load(svg_bytes)
+            if self.svg_widget.renderer().isValid():
                 self.setup_svg_widget()
-                print("自定义SVG显示成功")
+                # print("使用渲染器方式显示SVG成功")
             else:
-                print("SVG widget加载失败")
-                # 尝试使用渲染器方式
-                self.svg_widget.renderer().load(svg_bytes)
-                if self.svg_widget.renderer().isValid():
-                    self.setup_svg_widget()
-                    print("使用渲染器方式显示SVG成功")
-                else:
-                    raise Exception("SVG内容无法被widget加载")
-                    
+                raise Exception("SVG内容无法被widget加载")
+                
         except Exception as e:
             print(f"显示自定义SVG失败: {e}")
             # 如果失败，显示错误消息
@@ -386,36 +380,6 @@ class mai_button(QMainWindow):
             self.show_error_message(f"SVG验证过程出错: {e}")
             return None
         
-    def show_error_message(self, message):
-        try:
-            self.clear_svg_container()
-            
-            # 创建错误标签
-            error_label = QLabel(f"❌ {message}\n\n点击测试按钮重试")
-            error_label.setAlignment(Qt.AlignCenter)
-            error_label.setStyleSheet("""
-                QLabel {
-                    background-color: #ffebee;
-                    border: 2px solid #f44336;
-                    border-radius: 8px;
-                    color: #d32f2f;
-                    font-size: 14px;
-                    padding: 20px;
-                    font-family: Arial, sans-serif;
-                }
-            """)
-            error_label.setMinimumSize(200, 100)
-            
-            # 添加到布局
-            layout = self.svg_container.layout()
-            if layout:
-                layout.addWidget(error_label)
-            
-            print(f"显示错误消息: {message}")
-
-        except Exception as e:
-            print(f"显示错误消息失败: {e}")
-            
 
     def load_ui(self, ui_file_path):    
         """

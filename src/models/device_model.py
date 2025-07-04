@@ -1,6 +1,6 @@
 from utils.port_utils import read_com_port_number, write_com_port_value
 from utils.warning import show_warning
-from utils.serial_utils import SerialCommunicator
+from models.serial_model import SerialCommunicator
 
 
 

@@ -59,3 +59,39 @@ class svgHandle:
             if not found:
                 new_styles.append(f'fill:{target_color}')
             elem.set('style', ';'.join(new_styles))
+
+    def changeSvgNumber(self, label_name, target_number):
+        """
+        根据 inkscape:label 定位单元，修改其分数字段（tspan标签内容）。
+        """
+        try:
+            ns = {
+                'svg': 'http://www.w3.org/2000/svg',
+                'inkscape': 'http://www.inkscape.org/namespaces/inkscape'
+            }
+            ET.register_namespace('', ns['svg'])
+            ET.register_namespace('inkscape', ns['inkscape'])
+
+            root = ET.fromstring(self.svg_content)
+            found = False
+            for elem in root.iter():
+                label = elem.attrib.get('{http://www.inkscape.org/namespaces/inkscape}label')
+                if label == label_name:
+                    # 查找分数字段
+                    for text in elem.iter():
+                        if text.tag.endswith('text'):
+                            for tspan in text:
+                                # 只修改内容为数字的 tspan
+                                if tspan.text and tspan.text.strip().isdigit():
+                                    tspan.text = str(target_number)
+                                    found = True
+                    break
+            if not found:
+                print(f"[svgHandle] Label '{label_name}' or number tspan not found in SVG.")
+            new_svg = ET.tostring(root, encoding='utf-8', xml_declaration=True).decode('utf-8')
+            self.svg_content = new_svg
+            print("Change "+label_name+" number to "+str(target_number))
+            return new_svg
+        except Exception as e:
+            print(f"[svgHandle] changeSvgNumber error: {e}")
+            return self.svg_content

@@ -11,6 +11,7 @@ from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QCombo
 
 # 导入设备模型
 from models.device_model import Device
+from models.command_model import CommandData
 
 # 其他窗口模块
 from .port_setting import port_setting
@@ -55,6 +56,7 @@ class main_window(QMainWindow):
 
         self.userChooseDevice = 0
 
+        self.command_data = CommandData(command_id=0, command_params=[], command_size=0)
         self.serial_buffer = b''
         self.sendcmd = b'\x53\xff\x00'  # 默认发送的命令
         self.checkflag = False
@@ -296,37 +298,36 @@ class main_window(QMainWindow):
             if idx == -1 or idx + 2 >= len(self.serial_buffer):
                 break
             # get command byte
-            command_byte = self.serial_buffer[(idx + 1):(idx + 2)]
+            self.command_data.setID(self.serial_buffer[(idx + 1):(idx + 2)])
             length_byte = self.serial_buffer[(idx + 2):(idx + 3)]
 
             # 判断数据包长度是否正确
-            data_length = int.from_bytes(length_byte, 'big')
-            if idx + 2 + data_length > len(self.serial_buffer):
+            self.command_data.setSize(int.from_bytes(length_byte, 'big'))
+            if idx + 2 + self.command_data.getSize() > len(self.serial_buffer):
                 break
-            # 提取完整的数据包
-            pocket_byte = self.serial_buffer[(idx+3):(idx + 3 + data_length)]
 
-            # DEBUG
-            full_byte = self.serial_buffer[(idx):(idx + 3 + data_length)]
+            self.command_data.setParams(self.serial_buffer[(idx+3):(idx + 3 + self.command_data.getSize())])
+            self.command_data.setFullData(self.serial_buffer[(idx):(idx + 3 + self.command_data.getSize())])
+
             # 删除已处理的数据包
-            self.serial_buffer = self.serial_buffer[(idx + 3 + data_length):]
-
+            self.serial_buffer = self.serial_buffer[(idx + 3 + self.command_data.getSize()):]
 
             # 验证指令字段是否正确
-            print(f"DEBUG: checkflag={self.checkflag}, full_pack={full_byte.hex()}, sendcmd={self.sendcmd}, command_byte={command_byte.hex()}")
+            print(self.command_data)
+
 
             if self.checkflag and self.sendcmd is not None:
                 self.miniterminal.append("Checking command...")
-                if command_byte != self.sendcmd[1:2]:
-                    msg = f"Command check failed, expected: {self.sendcmd[1:2].hex()} but got: {command_byte.hex()}"
+                if self.command_data.getID() != self.sendcmd[1:2]:
+                    msg = f"Command check failed, expected: {self.sendcmd[1:2].hex()} but got: {self.command_data.getID().hex()}"
                     self.miniterminal.append(msg)
                 else:
                     self.miniterminal.append("Command check success.")
                 self.sendcmd = None  # 无论成功失败都立即清空
                 self.checkflag = False
 
-            print(f"Received command: {command_byte}, DataLength: {data_length}, Data: {pocket_byte}")
-            self.miniterminal.append(f"<span style='color:blue;'>{pocket_byte}</span>")
+
+            self.miniterminal.append(f"<span style='color:blue;'>{self.command_data.getParams()}</span>")
 
     ##############################################
 

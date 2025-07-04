@@ -90,6 +90,7 @@ class main_window(QMainWindow):
         self.dialog_button.helpRequested.connect(self.close_windows)
         self.device_selector.currentIndexChanged.connect(self.on_device_selected)
         self.send_cmd.clicked.connect(self.sendcmdevent)
+        self.input_cmd.returnPressed.connect(self.sendcmdevent)
         self.refresh_device_selector()
         self.is_admin()
         ##############################################

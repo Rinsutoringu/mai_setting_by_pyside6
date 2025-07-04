@@ -282,9 +282,21 @@ class main_window(QMainWindow):
             if idx == -1 or idx + 2 >= len(self.serial_buffer):
                 break
             # get command byte
-            command_byte = self.serial_buffer[idx:idx + 1]
-            length_byte = self.serial_buffer[idx + 1:idx + 2]
+            command_byte = self.serial_buffer[(idx):(idx + 1)]
+            length_byte = self.serial_buffer[(idx + 1):(idx + 2)]
+            
+            # 判断数据包长度是否正确
+            if length_byte != b'\x00':
+                # 如果长度不为0，说明有数据
+                data_length = int.from_bytes(length_byte, 'big')
+                if idx + 2 + data_length > len(self.serial_buffer):
+                    break
+                # 提取完整的数据包
+                pocket = self.serial_buffer[(idx):(idx + 2 + data_length)]
+                # 删除已处理的数据包
+                self.serial_buffer = self.serial_buffer[(idx + 2 + data_length):]
 
+                
 
 
         self.miniterminal.append(f"<span style='color:blue;'>{data}</span>")

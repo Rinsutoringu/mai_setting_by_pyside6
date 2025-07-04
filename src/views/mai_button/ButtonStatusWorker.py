@@ -16,7 +16,7 @@ class ButtonStatusWorker(QThread):
             if status != last_status:
                 self.status_changed.emit(status)
                 last_status = status
-            self.msleep(100)  # 100ms轮询一次
+            self.msleep(20)  # 20ms轮询一次
 
     def stop(self):
         self._running = False

@@ -32,21 +32,6 @@ class CommandData:
 
     def setParams(self, command_params):
         self.command_params = command_params
-        # print(f"DEBUG: CommandData.setParams called with {command_params}")
-        if self.command_id == b'\x12':
-            # print("DEBUG: Command ID is 0x12, processing button status matrix.")
-            if not self.command_params or len(self.command_params) < 8:
-                return [[0]*8 for _ in range(8)]
-            matrix = []
-            for i in range(8):
-                byte = self.command_params[i]
-                if isinstance(byte, str):
-                    value = int(byte, 16)
-                else:
-                    value = byte
-                bin_str = format(value, '08b')
-                matrix.append([int(b) for b in bin_str])
-            self.buttonStatus = matrix
 
     def getParams(self):
         return self.command_params
@@ -56,12 +41,3 @@ class CommandData:
 
     def getSize(self):
         return self.command_size
-        
-
-    def getButtonBitsMatrix(self):
-        """
-        将 command_params[0:8] 转换而成的 8x8 的二进制二维数组。
-        每个元素为 0 或 1。
-        """
-        return self.buttonStatus
-    

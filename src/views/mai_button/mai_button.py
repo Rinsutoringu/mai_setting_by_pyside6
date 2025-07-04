@@ -126,23 +126,6 @@ class mai_button(QMainWindow):
         """
         print("按钮状态更新，重新渲染SVG")
         matrix = self.command_data.getButtonBitsMatrix()
-        row_info = [
-            ("A", self.A_newcolor, 8),
-            ("B", self.B_newcolor, 8),
-            ("C", self.C_newcolor, 2),
-            ("D", self.D_newcolor, 8),
-            ("E", self.E_newcolor, 8),
-        ]
-        # 用于记录上一次的按钮状态
-        if not hasattr(self, "_last_matrix"):
-            self._last_matrix = [[None]*8 for _ in range(5)]
-        for row_idx, (prefix, color, count) in enumerate(row_info):
-            for col in range(count):
-                is_pressed = matrix[row_idx][col]
-                if self._last_matrix[row_idx][col] != is_pressed:
-                    label = f"{prefix}{col+1}"
-                    self.show_svg_on_screenview(label, color if is_pressed else self.oldcolor)
-                    self._last_matrix[row_idx][col] = is_pressed
 
 
     def close_windows(self):

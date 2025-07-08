@@ -125,8 +125,30 @@ class mai_button(QMainWindow):
         只对状态发生变化的按钮进行渲染，提高效率。
         """
         print("按钮状态更新，重新渲染SVG")
-        matrix = self.command_data.getButtonBitsMatrix()
+        # show_svg_on_screenview
+        # TODO
+        # 维护上一次获取按钮的状态 进行差量更新以降低性能开销
+        if not hasattr(self, '_last_button_states'):
+            self._last_button_states = [None] * 34
+        current_button_states = self.command_data.getButtonStatus()
+        for i in range(len(current_button_states)):
+            # 查找状态发生变化的按钮
+            if current_button_states[i] != self._last_button_states[i]:
+                # 根据按钮索引选择对应的标签和颜色
+                if i == 0:
+                    self.show_svg_on_screenview(f"A{i+1}", self.A_newcolor)
+                elif i == 1:
+                    self.show_svg_on_screenview(f"B{i-8+1}", self.B_newcolor)
+                elif i == 2:
+                    self.show_svg_on_screenview(f"C{i-16+1}", self.C_newcolor)
+                elif i == 3:
+                    self.show_svg_on_screenview(f"D{i-18+1}", self.D_newcolor)
+                elif i == 4:
+                    self.show_svg_on_screenview(f"E{i-26+1}", self.E_newcolor)
+                else:
+                    print(f"未知按钮索引: {i}")                
 
+        self._last_button_states = current_button_states
 
     def close_windows(self):
         """

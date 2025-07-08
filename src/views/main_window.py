@@ -124,6 +124,11 @@ class main_window(QMainWindow):
             return
         deviceComm = device.getSerialComm()
 
+        # 指令对照表
+        # 0x00 获取序列号
+        # 0x10 启动触摸数据发送流
+        # 0x11 停止触摸数据发送流
+
         if usrinput == "om serial":
             send_bytes = (b'\x53\x00\x00')
         elif usrinput == "om start":
@@ -295,22 +300,24 @@ class main_window(QMainWindow):
         while b'\x53' in self.serial_buffer:
             idx = self.serial_buffer.find(b'\x53')
             # Check if idx is -1 or the command is received
-            if idx == -1 or idx + 2 >= len(self.serial_buffer):
+            if idx == -1 or idx + 3 >= len(self.serial_buffer):
                 break
+            # get vefification byte
+            self.command_data.setvef(self.serial_buffer[idx + 1:idx + 2])
             # get command byte
-            self.command_data.setID(self.serial_buffer[(idx + 1):(idx + 2)])
-            length_byte = self.serial_buffer[(idx + 2):(idx + 3)]
+            self.command_data.setID(self.serial_buffer[(idx + 2):(idx + 3)])
+            length_byte = self.serial_buffer[(idx + 3):(idx + 4)]
 
             # 判断数据包长度是否正确
             self.command_data.setSize(int.from_bytes(length_byte, 'big'))
-            if idx + 2 + self.command_data.getSize() > len(self.serial_buffer):
+            if idx + 3 + self.command_data.getSize() > len(self.serial_buffer):
                 break
 
-            self.command_data.setParams(self.serial_buffer[(idx+3):(idx + 3 + self.command_data.getSize())])
-            self.command_data.setFullData(self.serial_buffer[(idx):(idx + 3 + self.command_data.getSize())])
+            self.command_data.setParams(self.serial_buffer[(idx + 4):(idx + 4 + self.command_data.getSize())])
+            self.command_data.setFullData(self.serial_buffer[(idx):(idx + 4 + self.command_data.getSize())])
 
             # 删除已处理的数据包
-            self.serial_buffer = self.serial_buffer[(idx + 3 + self.command_data.getSize()):]
+            self.serial_buffer = self.serial_buffer[(idx + 4 + self.command_data.getSize()):]
 
             # 验证指令字段是否正确
             # print(self.command_data)

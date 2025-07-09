@@ -23,10 +23,10 @@ class SerialCommunicator:
         self.logger = logging.getLogger(__name__)
 
         # DEBUG
-        # logging.basicConfig(
-        #     level=logging.DEBUG,
-        #     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        # )
+        logging.basicConfig(
+            level=logging.DEBUG,
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        )
 
     def __repr__(self):
         return f"SerialCommunicator(is_connected={self.is_connected}, is_listening={self.is_listening}, serial_port={self.serial_port}, receive_queue_size={self.receive_queue.qsize()})"
@@ -244,6 +244,7 @@ class SerialCommunicator:
                 if self.serial_port and self.serial_port.in_waiting > 0:
                     data = self.serial_port.read(self.serial_port.in_waiting)
                     if data:
+                        # print(f"接收到原始数据: {data.hex()}")
                         if self.data_callback:
                             try:
                                 self.data_callback(data)

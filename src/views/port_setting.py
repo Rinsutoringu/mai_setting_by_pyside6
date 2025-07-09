@@ -29,7 +29,7 @@ class port_setting(QMainWindow):
         self.device_paths = device_paths
         # 检查 device_paths 是否为 None 或空
         if not self.device_paths:
-            show_warning("Initialization Error", "Device paths are invalid or empty!")
+            show_warning("Initialization Error", "Device Not Found!")
             self.label = QLabel("No Device Found", self)
             return
 

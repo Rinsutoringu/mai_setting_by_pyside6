@@ -66,5 +66,4 @@ class CommandData:
         if self.command_id == b'\x12':
             return self.converButtonStatus()
         else :
-            print("command id is not 0x12")
             return None

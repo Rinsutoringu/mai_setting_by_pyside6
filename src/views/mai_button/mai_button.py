@@ -42,7 +42,7 @@ class mai_button(QMainWindow):
         self.command_data = command_data
         # 检查 device_paths 是否为 None 或空
         if not self.device_paths:
-            show_warning("Initialization Error", "Device paths are invalid or empty!")
+            # show_warning("Initialization Error", "Device paths are invalid or empty!")
             self.label = QLabel("No Device Found", self)
             return
 
@@ -128,22 +128,26 @@ class mai_button(QMainWindow):
         # show_svg_on_screenview
         # TODO
         # 维护上一次获取按钮的状态 进行差量更新以降低性能开销
+        
+        # 初始化缓存数组
         if not hasattr(self, '_last_button_states'):
             self._last_button_states = [None] * 34
+        # 获取当前按钮状态
         current_button_states = self.command_data.getButtonStatus()
+        # 遍历current_button_states
         for i in range(len(current_button_states)):
             # 查找状态发生变化的按钮
             if current_button_states[i] != self._last_button_states[i]:
                 # 根据按钮索引选择对应的标签和颜色
-                if i == 0:
+                if i < 8:
                     self.show_svg_on_screenview(f"A{i+1}", self.A_newcolor)
-                elif i == 1:
+                elif i >= 8 and i < 16:
                     self.show_svg_on_screenview(f"B{i-8+1}", self.B_newcolor)
-                elif i == 2:
+                elif i >= 16 and i < 18:
                     self.show_svg_on_screenview(f"C{i-16+1}", self.C_newcolor)
-                elif i == 3:
+                elif i >= 18 and i < 26:
                     self.show_svg_on_screenview(f"D{i-18+1}", self.D_newcolor)
-                elif i == 4:
+                elif i >= 26 and i < 34:
                     self.show_svg_on_screenview(f"E{i-26+1}", self.E_newcolor)
                 else:
                     print(f"未知按钮索引: {i}")                

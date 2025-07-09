@@ -305,11 +305,13 @@ class main_window(QMainWindow):
             # get vefification byte
             self.command_data.setvef(self.serial_buffer[idx + 1:idx + 2])
             # get command byte
-            self.command_data.setID(self.serial_buffer[(idx + 2):(idx + 3)])
-            length_byte = self.serial_buffer[(idx + 3):(idx + 4)]
+
+            # print("set ID ", self.serial_buffer[(idx + 2):(idx + 3)])
+
+            self.command_data.setID(self.serial_buffer[(idx + 1):(idx + 2)])
+            self.command_data.setSize(int.from_bytes(self.serial_buffer[(idx + 3):(idx + 4)], byteorder='big'))
 
             # 判断数据包长度是否正确
-            self.command_data.setSize(int.from_bytes(length_byte, 'big'))
             if idx + 3 + self.command_data.getSize() > len(self.serial_buffer):
                 break
 

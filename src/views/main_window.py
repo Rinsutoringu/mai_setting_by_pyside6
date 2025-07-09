@@ -58,8 +58,6 @@ class main_window(QMainWindow):
 
         self.command_data = CommandData(command_id=0, command_params=[], command_size=0)
         self.serial_buffer = b''
-        self.sendcmd = b'\x53\xff\x00'  # 默认发送的命令
-        self.checkflag = False
 
         ##############################################
         # 初始化按钮
@@ -145,10 +143,11 @@ class main_window(QMainWindow):
             self.input_cmd.clear()
 
         deviceComm.send_bytes(send_bytes)
-        print(f"Sent command: {usrinput}")
-        self.sendcmd = send_bytes
+        self.command_data.setUserSendCmd(send_bytes)
         self.input_cmd.clear()
-        self.checkflag = True
+
+        msg = "[DEBUG] Sent command: " + " ".join(f"{b:02x}" for b in send_bytes)
+        print(msg)
 
 
     def close_windows(self):
@@ -185,7 +184,8 @@ class main_window(QMainWindow):
             if self.devices[i].check_connect():
                 # 提取设备关键信息
                 self.device_selector.addItem(f"Device {i + 1} ({self.devices[i].getDevicePath()[0][58:68]})")
-                print("发现设备")
+                msg = f"[DEBUG] Device {i + 1} ({self.devices[i].getDevicePath()[0][58:68]}) is connected."
+                print(msg)
 
     def on_device_selected(self, index):
         """
@@ -288,53 +288,118 @@ class main_window(QMainWindow):
         deviceComm.start_listening(callback=self.on_serial_data)
     
         # DEBUG
-        print(f"Selected device: {device}")
-        # print(f"Selected deviceComm: {deviceComm}")
-        print("Device connected, in port "+ port)
+        print(f"[DEBUG] Selected device: {device}")
+        # print(f"[DEBUG] Selected deviceComm: {deviceComm}")
+        print(f"[DEBUG] Device connected, in port {port}")
 
         return True
-    
+
+    def handel_escape(self, data: bytes, cache: bytes):
+        """处理转义字符0x7c
+        Args:
+            data (bytes): 输入数据
+            cache (bytes): 缓存数据
+        Yields:
+            after_data: 处理后的数据
+            unhandle_data: 未处理的数据
+        """
+        data = cache + data
+        result = bytearray()
+        i = 0
+        while i < len(data):
+            # 检测到当前字节是0x7c时
+            if data[i] == 0x7c:
+                # 如果0x7c是最后一个字节
+                if i + 1 >= len(data):
+                    # 此时将不会处理0x7c，并顺带返回完成处理后的结果
+                    return bytes(result), data[i:]
+                if data[i+1] == 0x7c:
+                    # 如果下一个字节也是0x7c，保留一个0x7c
+                    result.append(0x7c)
+                    i += 2
+                else:
+                    # 对应操作符的解释指令
+                    i += 1
+            else:
+                # 如果当前字节不是0x7c，直接添加到结果中
+                result.append(data[i])
+                i += 1
+        # 如果运行到底了，说明没有未处理的字节，返回空值即可
+        return bytes(result), b''
+
     def on_serial_data(self, data):
-        # DEBUG
         self.serial_buffer += data
+
+        # 进行反转译处理
+        result, self._escape_cache = self.handel_escape(self.serial_buffer, self._escape_cache)
+        self.serial_buffer = result
+
+        # 进行指令校验
         while b'\x53' in self.serial_buffer:
             idx = self.serial_buffer.find(b'\x53')
             # Check if idx is -1 or the command is received
             if idx == -1 or idx + 3 >= len(self.serial_buffer):
                 break
-            # get vefification byte
-            self.command_data.setvef(self.serial_buffer[idx + 1:idx + 2])
-            # get command byte
 
-            # print("set ID ", self.serial_buffer[(idx + 2):(idx + 3)])
-
-            self.command_data.setID(self.serial_buffer[(idx + 1):(idx + 2)])
-            self.command_data.setSize(int.from_bytes(self.serial_buffer[(idx + 3):(idx + 4)], byteorder='big'))
+            payload_size = (int.from_bytes(self.serial_buffer[(idx + 3):(idx + 4)], byteorder='big'))
 
             # 判断数据包长度是否正确
-            if idx + 3 + self.command_data.getSize() > len(self.serial_buffer):
+            if idx + 4 + payload_size > len(self.serial_buffer):
                 break
-
-            self.command_data.setParams(self.serial_buffer[(idx + 4):(idx + 4 + self.command_data.getSize())])
-            self.command_data.setFullData(self.serial_buffer[(idx):(idx + 4 + self.command_data.getSize())])
+   
+            fulldata = self.serial_buffer[(idx):(idx + 4 + payload_size)]
 
             # 删除已处理的数据包
-            self.serial_buffer = self.serial_buffer[(idx + 4 + self.command_data.getSize()):]
+            self.serial_buffer = self.serial_buffer[(idx + 4 + payload_size):]
 
-            # 验证指令字段是否正确
-            # print(self.command_data)
+            self.command_data.setFullData(fulldata)
+            self.command_data.setPayloadSize(payload_size)
+
+            # DEBUG
+            param_str = "[DEBUG] receive package "+" ".join(f"{b:02x}" for b in enumerate(fulldata)) + "\n"
+            print(param_str)
 
 
-            if self.checkflag and self.sendcmd is not None:
-                self.miniterminal.append("Checking command...")
-                if self.command_data.getID() != self.sendcmd[1:2]:
-                    msg = f"Command check failed, expected: {self.sendcmd[1:2].hex()} but got: {self.command_data.getID().hex()}"
-                    self.miniterminal.append(msg)
-                else:
-                    self.miniterminal.append("Command check success.")
-                self.sendcmd = None  # 无论成功失败都立即清空
-                self.checkflag = False
 
+        # while b'\x53' in self.serial_buffer:
+        #     idx = self.serial_buffer.find(b'\x53')
+        #     # Check if idx is -1 or the command is received
+        #     if idx == -1 or idx + 3 >= len(self.serial_buffer):
+        #         break
+
+        #     # get command byte
+        #     self.command_data.setID(self.serial_buffer[(idx + 1):(idx + 2)])
+
+        #     # get vefification byte
+        #     self.command_data.setvef(self.serial_buffer[idx + 2:idx + 3])
+
+        #     # get command size
+        #     self.command_data.setSize(int.from_bytes(self.serial_buffer[(idx + 3):(idx + 4)], byteorder='big'))
+
+        #     # 判断数据包长度是否正确
+        #     if idx + 4 + self.command_data.getSize() > len(self.serial_buffer):
+        #         break
+
+        #     self.command_data.setParams(self.serial_buffer[(idx + 4):(idx + 4 + self.command_data.getSize())])
+        #     self.command_data.setFullData(self.serial_buffer[(idx):(idx + 4 + self.command_data.getSize())])
+
+        #     fulldata = self.command_data.getFullData()
+        #     param_str = "[DEBUG] receive command data "+" ".join(f"{b:02x}" for i, b in enumerate(fulldata)) + "\n"
+        #     print(param_str)
+        #     print()
+
+        #     # 删除已处理的数据包
+        #     self.serial_buffer = self.serial_buffer[(idx + 4 + self.command_data.getSize()):]
+
+        #     if self.checkflag and self.sendcmd is not None:
+        #         self.miniterminal.append("Checking command...")
+        #         if self.command_data.getID() != self.sendcmd[1:2]:
+        #             msg = f"Command check failed, expected: {self.sendcmd[1:2].hex()} but got: {self.command_data.getID().hex()}"
+        #             self.miniterminal.append(msg)
+        #         else:
+        #             self.miniterminal.append("Command check success.")
+        #         self.sendcmd = None  # 无论成功失败都立即清空
+        #         self.checkflag = False
 
             self.miniterminal.append(f"<span style='color:blue;'>{self.command_data.getParams()}</span>")
 

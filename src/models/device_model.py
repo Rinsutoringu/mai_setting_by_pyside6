@@ -31,7 +31,7 @@ class Device:
             self.check_connect()
 
     def __repr__(self):
-        return f"[\nDevice RegPath: \n{self.device_path}\nConnect Status: {self.isConnect} \nTouch Port: {self.touch_port}, Aime Port: {self.aime_port}, LED Port: {self.led_port}, Command Port: {self.command_port}, \nSerial Comm: {self.serial_comm}\n]\n"
+        return f"[Device RegPath: \n    {self.device_path}\n    Connect Status: {self.isConnect} \n    Touch Port: {self.touch_port}, Aime Port: {self.aime_port}, LED Port: {self.led_port}, Command Port: {self.command_port}, \n    Serial Comm: {self.serial_comm}]\n"
 
     def setDevicePath(self, device_path):
         self.device_path = device_path

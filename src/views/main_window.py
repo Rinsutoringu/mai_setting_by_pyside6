@@ -313,13 +313,20 @@ class main_window(QMainWindow):
                 if i + 1 >= len(data):
                     # 此时将不会处理0x7c，并顺带返回完成处理后的结果
                     return bytes(result), data[i:]
+                
+                # 对0x7c进行反转义
                 if data[i+1] == 0x7c:
                     # 如果下一个字节也是0x7c，保留一个0x7c
                     result.append(0x7c)
                     i += 2
-                else:
-                    # 对应操作符的解释指令
-                    i += 1
+                
+                # 对0x53进行反转义
+                elif data[i+1] == 0x53:
+                    # 如果被转义的字节是0x53，添加一个None到结果中
+                    # 这里的None表示一个占位符
+                    result.append(None)
+                    i += 2
+
             else:
                 # 如果当前字节不是0x7c，直接添加到结果中
                 result.append(data[i])

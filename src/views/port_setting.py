@@ -10,7 +10,6 @@ from PySide6.QtCore import QFile, QIODevice
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox, QTextBrowser, QLabel
 from utils.warning import show_warning
-from utils.string_utils import extract_device_number
 
 class port_setting(QMainWindow):
     _instance = None

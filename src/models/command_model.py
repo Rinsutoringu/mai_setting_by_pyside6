@@ -21,7 +21,7 @@ class CommandData:
         self.status = None
         self.usersendcmd = None
         self.omconfig = omconfig
-        self.OMT = self.omconfig.getOMT()  # 获取OMT句柄
+        self.OMT = None  # 获取OMT句柄
         # print(1)
 
     def __repr__(self):

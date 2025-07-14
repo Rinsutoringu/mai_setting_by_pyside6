@@ -10,11 +10,10 @@ class package_receive:
         self.buffer = bytearray()
         self.packet = bytearray()
         self.omconfig = omconfig
-        self.OMT = None
+        self.LS = None
 
     def receive_byte(self, byte):
         # if self.OMT is None:
-        #     self.OMT = self.omconfig.getOMT()
         
         # print(debug_log("传入的数据:", " ".join(f"0x{b:02x}" for b in byte)))
         for i in byte:

@@ -7,7 +7,8 @@ class omConfig:
         ###############################
         # please do not edit this config
         ###############################
-        self.omt = None
+        self.signal = None
+        self.cmdsignal = None
 
 
     def getUpdateTime(self):
@@ -18,9 +19,9 @@ class omConfig:
 
     def getDisplayUpdateTime(self):
         return self.display_update_time
-    
-    def setOMT(self, omt):
-        self.omt = omt
 
-    def getOMT(self):
-        return self.omt
+    def setSignal(self, signal):
+        self.signal = signal
+
+    def getSignal(self):
+        return self.signal

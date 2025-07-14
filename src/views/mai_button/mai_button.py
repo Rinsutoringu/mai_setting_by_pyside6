@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (QMainWindow, QPushButton, QDialogButtonBox, QLabe
                                QWidget, QVBoxLayout)
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtSvg import QSvgRenderer
-from views.mai_button.ButtonStatusWorker import ButtonStatusWorker
+# from views.mai_button.ButtonStatusWorker import ButtonStatusWorker
 from utils.warning import show_warning
 from utils.svghandle import svgHandle
 from utils.debuglog import debug_log
@@ -111,9 +111,9 @@ class mai_button(QMainWindow):
         QTimer.singleShot(200, self.initialize_svg)
         #####################################
 
-        self.status_worker = ButtonStatusWorker(self.command_data, self.omconfig)
-        self.status_worker.status_changed.connect(self.on_button_status_changed)
-        self.status_worker.start()
+        # self.status_worker = ButtonStatusWorker(self.command_data, self.omconfig)
+        # self.status_worker.status_changed.connect(self.on_button_status_changed)
+        # self.status_worker.start()
 
         self.oldcolor   = "#a3c4ff"
         self.A_newcolor = "#4CAF50"
@@ -134,11 +134,17 @@ class mai_button(QMainWindow):
         # 获取当前按钮状态
         
         current_button_states = self.command_data.getButtonStatus()
-        print(debug_log("当前按钮状态数组:", current_button_states))
 
         if current_button_states is None or len(current_button_states) != 64:
             print(debug_log("获取按钮状态数组长度异常，请检查mai_button.py中的getButtonStatus方法"))
             return
+
+        if current_button_states[34] == self._last_button_states:
+            return
+        
+        print(debug_log("当前按钮状态数组:", current_button_states))
+
+
         for i in range(34):
             if current_button_states[i] != self._last_button_states[i]:
                 # 如果状态发生变化，更新SVG

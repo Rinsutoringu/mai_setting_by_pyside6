@@ -5,7 +5,7 @@
 import sys
 import os
 import ctypes
-from PySide6.QtCore import QFile, QIODevice
+from PySide6.QtCore import QFile, QIODevice, QObject, Signal
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QComboBox, QCheckBox, QTextBrowser, QLineEdit
 
@@ -23,10 +23,14 @@ from .mai_button.mai_button import mai_button
 from utils.port_utils import find_device_usb_path
 from utils.warning import show_warning
 from utils.package_receive import package_receive
-
 from utils.debuglog import debug_log
+from utils.cmd_listener import CMD_listener
+from utils.cmd_handler import CMD_Handler
 
 
+class CommandSignal(QObject):
+    log_signal = Signal(str)
+    command_signal = Signal(bytes)
 
 class main_window(QMainWindow):
     _instance = None
@@ -88,7 +92,7 @@ class main_window(QMainWindow):
         self.input_cmd          = self.findChild(QLineEdit, 'inputcmdbox')
 
         ##############################################
-        # 事件绑定
+        # 连接事件和槽
         ##############################################
         self.port_setting.clicked.connect(self.open_port_setting)
         self.mai_button.clicked.connect(self.open_mai_button)
@@ -100,6 +104,13 @@ class main_window(QMainWindow):
         self.device_selector.currentIndexChanged.connect(self.on_device_selected)
         self.send_cmd.clicked.connect(self.sendcmdevent)
         self.input_cmd.returnPressed.connect(self.sendcmdevent)
+
+        self.command_signal = CommandSignal()
+        self.command_signal.log_signal.connect(self.show_log)
+
+        ##############################################
+        # 初始化函数
+        ##############################################
         self.refresh_device_selector()
         self.is_admin()
         ##############################################
@@ -123,8 +134,23 @@ class main_window(QMainWindow):
             main_window_instance = self
         )
 
-        # 保存 miniterminal句柄到omconfig中
-        self.omconfig.setOMT(self.miniterminal)
+        # 保存信号句柄
+        self.omconfig.setSignal(self.command_signal)
+
+        self.cmd_listener = CMD_listener(
+            command_data=self.command_data,
+            omconfig=self.omconfig,
+            package_receiver=self.package_receiver
+        )
+        self.cmd_listener.start()
+
+        self.cmd_handler = CMD_Handler(
+            omconfig=self.omconfig,
+            command_data=self.command_data,
+            mai_button=self.mai_button_window,
+            package_receiver=self.package_receiver
+        )
+
     ##############################################
     # 事件
     ##############################################
@@ -174,6 +200,16 @@ class main_window(QMainWindow):
 
         msg = "Sent command: " + " ".join("0x"+f"{b:02x}" for b in send_bytes)
         print(debug_log(msg))
+
+    def show_log(self, msg):
+        """
+        显示日志
+        :param msg: 日志消息
+        """
+        # 这里安全地操作GUI控件
+        msg = debug_log(msg)
+        print(msg)
+        self.miniterminal.append(msg)
 
 
     def close_windows(self):
@@ -328,6 +364,8 @@ class main_window(QMainWindow):
         result = self.package_receiver.receive_byte(data)
         # 如果接收到完整的数据包，处理数据包
         if result is not None:
+            # 设置接收完成变量
+            self.cmd_listener.setIsReceive(True)
             self.command_data.setFullData(result)
 
         # self.miniterminal.append(f"<span style='color:blue;'>{result}</span>")

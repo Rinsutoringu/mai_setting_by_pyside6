@@ -21,7 +21,7 @@ class CommandData:
         self.status = None
         self.usersendcmd = None
         self.omconfig = omconfig
-        self.OMT = None  # 获取OMT句柄
+        self.signal = None  # 获取log句柄
         # print(1)
 
     def __repr__(self):
@@ -40,8 +40,8 @@ class CommandData:
         self.SplitData()
 
     def SplitData(self):
-        if self.OMT is None:
-            self.OMT = self.omconfig.getOMT()
+        if self.signal is None:
+            self.signal = self.omconfig.getSignal()
         if self.fulldata is not None:
             index = 1
             self.command = self.fulldata[index]
@@ -90,19 +90,19 @@ class CommandData:
     def checkPacket(self):
         if self.getUserCMD() is not None:
             msg = debug_log("Start Checking command...")
-            print(msg)
-            self.OMT.append(msg)
+            self.signal.log_signal.emit(msg)
+
             if self.getUserCMD()[1:2] != self.getCMD().to_bytes(1, 'big'):
                 # msg = f"Command check failed, user input: 0x{self.getUserCMD()[1:2].hex()} but got: 0x{self.getCMD().to_bytes(1, 'big').hex()}"
                 msg = debug_log("CMD Check Failed")
-                print(msg)
-                self.OMT.append(msg)
+                self.signal.log_signal.emit(msg)
+
                 self.setUserCMD(None)
                 return False
             
             else:
                 self.setUserCMD(None)  
                 msg = debug_log("Command check passed.")
-                print(msg)
-                self.OMT.append(msg)
+                self.signal.log_signal.emit(msg)
+
                 return True

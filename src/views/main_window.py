@@ -130,20 +130,20 @@ class main_window(QMainWindow):
         # 0x11 停止触摸数据发送流
 
         if usrinput == "om serial":
-            send_bytes = (b'\x53\x00\x00')
+            send_bytes = self.command_data.PC_CMD_GET_SERIAL
         elif usrinput == "om start":
-            send_bytes = (b'\x53\x10\x00')
+            send_bytes = self.command_data.PC_CMD_TOUCH_DBG_START
         elif usrinput == "om stop":
-            send_bytes = (b'\x53\x11\x00')
-        elif usrinput == "om data":
-            send_bytes = (b'\x53\x12\x00')
-        elif usrinput == "om sens":
-            send_bytes = (b'\x53\x13\x00')
+            send_bytes = self.command_data.PC_CMD_TOUCH_DBG_STOP
+        elif usrinput == "om restart":
+            send_bytes = self.command_data.PC_CMD_TOUCH_RESTART
 
         else :
             show_warning("error", "Unknown command!")
             self.input_cmd.clear()
 
+        # 转成16进制字节并拼接数据
+        send_bytes = bytes([0x53, send_bytes, 0x00])
         deviceComm.send_bytes(send_bytes)
         self.command_data.setUserCMD(send_bytes)
         self.input_cmd.clear()

@@ -1,6 +1,3 @@
-
-
-
 class package_receive:
     AWAIT = 0       # 待命
     IN_PACKET = 1   # 正在读取

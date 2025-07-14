@@ -2,6 +2,17 @@
 
 class CommandData:
     def __init__(self, command, payload, payload_length):
+
+        self.PC_CMD_GET_SERIAL = 0x00       # 序列号
+        self.PC_CMD_TOUCH_DBG_START = 0x10  # 触摸调试开始
+        self.PC_CMD_TOUCH_DBG_STOP = 0x11   # 触摸调试结束
+        self.PC_CMD_TOUCH_DBG_DATA = 0x12   # 触摸调试结束
+        self.PC_CMD_TOUCH_RESTART = 0x13    # 触摸调试结束
+
+        self.PC_CMD_CFG_GET = 0x20          # 获取配置
+        self.PC_CMD_CFG_SET = 0x21          # 设置配置
+        self.PC_CMD_CFG_SAVE = 0x23         # 保存配置
+
         self.command = command
         self.payload = payload
         self.payload_length = payload_length
@@ -12,13 +23,6 @@ class CommandData:
 
     def __repr__(self):
         return f"CommandData(id={self.command}, params={self.payload}, size={self.payload_length}), buttonStatus={self.buttonStatus}, fullData={self.fulldata}"
-
-    def clear(self):
-        self.command = 0
-        self.payload = 0
-        self.payload_length = 0
-        self.buttonStatus = None
-        self.fulldata = None
 
     # 获取用户发送的指令
     def setUserCMD(self, cmd):
@@ -68,7 +72,7 @@ class CommandData:
 
     # 获取按钮状态数组
     def getButtonStatus(self):
-        if self.command == 0x12:
+        if self.command == self.PC_CMD_TOUCH_DBG_DATA:
             return self.convertButtonStatus()
         else :
             return None

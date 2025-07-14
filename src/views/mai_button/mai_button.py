@@ -26,7 +26,7 @@ class mai_button(QMainWindow):
             cls._instance = super(mai_button, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, ui_file_path, device_paths, selected_device: int, command_data, main_window_instance=None):
+    def __init__(self, ui_file_path, omconfig, device_paths, selected_device: int, command_data, main_window_instance=None):
         if hasattr(self, '_initialized') and self._initialized:
             return
         super(mai_button, self).__init__()
@@ -56,6 +56,9 @@ class mai_button(QMainWindow):
         # 获取main_window实例句柄
         self.main_window = main_window_instance
         self.ConnectDevice = self.main_window.getDevices()
+
+        # 获取omconfig实例
+        self.omconfig = omconfig
         
         # 从main_window获取用户选择的设备
         if self.ConnectDevice == {}:
@@ -107,7 +110,7 @@ class mai_button(QMainWindow):
         QTimer.singleShot(200, self.initialize_svg)
         #####################################
 
-        self.status_worker = ButtonStatusWorker(self.command_data)
+        self.status_worker = ButtonStatusWorker(self.command_data, self.omconfig)
         self.status_worker.status_changed.connect(self.on_button_status_changed)
         self.status_worker.start()
 

@@ -12,6 +12,7 @@ from PySide6.QtWidgets import QMainWindow, QPushButton, QDialogButtonBox, QCombo
 # 导入设备模型
 from models.device_model import Device
 from models.command_model import CommandData
+from utils.omconfig import omConfig
 
 # 其他窗口模块
 from .port_setting import port_setting
@@ -57,10 +58,14 @@ class main_window(QMainWindow):
 
         self.userChooseDevice = 0
 
-        self.command_data = CommandData(command=0, payload=[], payload_length=0)
-        
-        self.package_receiver = package_receive()
+        ##############################################
+        # 初始化持有类对象实例
+        ##############################################
 
+        self.omconfig = omConfig()
+        self.command_data = CommandData(self.omconfig, command=0, payload=[], payload_length=0)
+        self.package_receiver = package_receive(self.omconfig)
+        
         ##############################################
         # 初始化按钮
         ##############################################
@@ -100,8 +105,21 @@ class main_window(QMainWindow):
         ##############################################
         # 初始化子窗口
         ##############################################
-        self.port_setting_window    = port_setting("src/ui/port_setting.ui", self.device_paths, self.selected_device, main_window_instance=self)
-        self.mai_button_window      = mai_button("src/ui/mai_button.ui", self.device_paths, self.selected_device, self.command_data, main_window_instance=self)
+        self.port_setting_window = port_setting(
+            ui_file_path    = "src/ui/port_setting.ui", 
+            omconfig        = self.omconfig, 
+            device_paths    = self.device_paths, 
+            selected_device = self.selected_device, 
+            main_window_instance = self)
+        
+        self.mai_button_window = mai_button(
+            ui_file_path    = "src/ui/mai_button.ui", 
+            omconfig        = self.omconfig, 
+            device_paths    = self.device_paths, 
+            selected_device = self.selected_device, 
+            command_data    = self.command_data, 
+            main_window_instance = self
+        )
     ##############################################
     # 事件
     ##############################################
@@ -183,7 +201,7 @@ class main_window(QMainWindow):
 
         # device_paths是一个二维数组，列数为识别到的合法设备数量，行为每个串口子设备的注册表路径
         for i in range(len(self.device_paths)):
-            self.devices[i] = Device(device_path=self.device_paths[i])
+            self.devices[i] = Device(omconfig=self.omconfig, device_path=self.device_paths[i])
             if self.devices[i].check_connect():
                 # 提取设备关键信息
                 self.device_selector.addItem(f"Device {i + 1} ({self.devices[i].getDevicePath()[0][58:68]})")
@@ -300,7 +318,8 @@ class main_window(QMainWindow):
     def on_serial_data(self, data):
         """
         串口数据接收回调函数
-        """    
+        """
+        # print("[调试信息] 接收到数据: " + " ".join("0x"+f"{b:02x}" for b in data))
         result = self.package_receiver.receive_byte(data)
         # 如果接收到完整的数据包，处理数据包
         if result is not None:

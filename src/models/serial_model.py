@@ -13,7 +13,7 @@ class SerialCommunicator:
     提供串口连接、数据发送、数据接收等功能
     """
     
-    def __init__(self):
+    def __init__(self, omconfig):
         self.serial_port: Optional[serial.Serial] = None
         self.is_connected = False
         self.is_listening = False
@@ -21,6 +21,8 @@ class SerialCommunicator:
         self.receive_queue = Queue()
         self.data_callback: Optional[Callable] = None
         self.logger = logging.getLogger(__name__)
+        self.omconfig = omconfig
+        self.listen_loop_delay = self.omconfig.getSerialUpdateTime()*0.01  # 获取轮询时间
 
         # DEBUG
         logging.basicConfig(
@@ -251,7 +253,7 @@ class SerialCommunicator:
                             except Exception as e:
                                 self.logger.error(f"回调函数执行错误: {e}")
                 
-                time.sleep(0.01)  # 避免过度占用CPU
+                time.sleep(self.listen_loop_delay)  # 避免过度占用CPU
                 
             except Exception as e:
                 self.logger.error(f"监听过程中发生错误: {e}")

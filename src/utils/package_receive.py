@@ -3,11 +3,12 @@ class package_receive:
     IN_PACKET = 1   # 正在读取
     ESCAPE = 2      # 转义状态
 
-    def __init__(self):
+    def __init__(self, omconfig):
         self.state = self.AWAIT
         self.buffer = bytearray()
         self.packet = bytearray()
-    
+        self.omconfig = omconfig
+
     def receive_byte(self, byte):
         
         # print("[调试信息]：传入的数据:", " ".join(f"0x{b:02x}" for b in byte))

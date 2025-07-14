@@ -6,10 +6,11 @@ from models.serial_model import SerialCommunicator
 
 class Device:
     
-    def __init__(self, device_path=None, touch_port=None, aime_port=None, led_port=None, command_port=None):
+    def __init__(self, omconfig, device_path=None, touch_port=None, aime_port=None, led_port=None, command_port=None):
         """
         初始化设备对象
         """
+        self.omconfig = omconfig
         # 设备的注册表路径
         self.device_path = device_path
         # 触摸设备端口
@@ -23,7 +24,7 @@ class Device:
         # 连接状态
         self.isConnect = False
         # serial comm object
-        self.serial_comm = SerialCommunicator()  # 用于保存串口连接对象
+        self.serial_comm = SerialCommunicator(self.omconfig)  # 用于保存串口连接对象
 
         # TODO 自动获取设备当前各设备端口
         if device_path:

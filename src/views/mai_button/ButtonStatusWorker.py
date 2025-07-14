@@ -3,11 +3,12 @@ from PySide6.QtCore import QThread, Signal
 class ButtonStatusWorker(QThread):
     status_changed = Signal(dict)
 
-    def __init__(self, command_data, parent=None):
+    def __init__(self, command_data, omconfig, parent=None):
         super().__init__(parent)
         self.command_data = command_data
+        self.omconfig = omconfig
         self._running = True
-        self.sleep_time = 100  # 默认轮询时间为100毫秒
+        self.sleep_time = self.omconfig.getDisplayUpdateTime()  # 默认轮询时间为100毫秒
 
     def run(self):
         last_status = None

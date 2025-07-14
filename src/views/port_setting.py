@@ -19,7 +19,7 @@ class port_setting(QMainWindow):
             cls._instance = super(port_setting, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, ui_file_path, device_paths, selected_device: int, main_window_instance=None):
+    def __init__(self, ui_file_path, device_paths, omconfig, selected_device: int, main_window_instance=None):
         if hasattr(self, '_initialized') and self._initialized:
             return
         super(port_setting, self).__init__()
@@ -43,6 +43,9 @@ class port_setting(QMainWindow):
         # 获取main_window实例句柄
         self.main_window = main_window_instance
         self.ConnectDevice = self.main_window.getDevices()
+
+        # 获取omconfig实例
+        self.omconfig = omconfig
         
         # 从main_window获取用户选择的设备
         if self.ConnectDevice == {}:

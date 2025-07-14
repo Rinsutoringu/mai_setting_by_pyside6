@@ -1,7 +1,7 @@
 
 
 class CommandData:
-    def __init__(self, command, payload, payload_length):
+    def __init__(self, omconfig, command, payload, payload_length):
 
         self.PC_CMD_GET_SERIAL = 0x00       # 序列号
         self.PC_CMD_TOUCH_DBG_START = 0x10  # 触摸调试开始
@@ -46,6 +46,11 @@ class CommandData:
             self.payload_length = self.fulldata[index]
             index += 1
             self.payload = self.fulldata[index:index + self.payload_length]
+
+            if self.checkPacket():
+                msg = "[调试信息] Command check passed."
+                print(msg)
+
     # 内部函数
     def getCMD(self):
         if self.fulldata is not None:
@@ -82,8 +87,11 @@ class CommandData:
         if self.getUserCMD() is not None:
             msg = "[调试信息] Start Checking command..."
             print(msg)
-            if self.getReceivedCMD() != self.getUserCMD()[1:2]:
-                msg = f"Command check failed, expected: {self.getUserCMD()[1:2].hex()} but got: {self.getReceivedCMD().hex()}"
+            if self.getUserCMD()[1:2] != self.getCMD().to_bytes(1, 'big'):
+                msg = f"[调试信息] Command check failed, user input: 0x{self.getUserCMD()[1:2].hex()} but got: 0x{self.getCMD().to_bytes(1, 'big').hex()}"
                 print(msg)
+                self.setUserCMD(None)
+                return False
             else:
-                self.setUserCMD(None)  # 无论成功失败都立即清空
+                self.setUserCMD(None)  
+                return True

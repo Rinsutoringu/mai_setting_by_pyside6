@@ -1,4 +1,4 @@
-
+from utils.debuglog import debug_log
 
 class CommandData:
     def __init__(self, omconfig, command, payload, payload_length):
@@ -20,6 +20,9 @@ class CommandData:
         self.fulldata = None
         self.status = None
         self.usersendcmd = None
+        self.omconfig = omconfig
+        self.OMT = self.omconfig.getOMT()  # 获取OMT句柄
+        # print(1)
 
     def __repr__(self):
         return f"CommandData(id={self.command}, params={self.payload}, size={self.payload_length}), buttonStatus={self.buttonStatus}, fullData={self.fulldata}"
@@ -37,6 +40,8 @@ class CommandData:
         self.SplitData()
 
     def SplitData(self):
+        if self.OMT is None:
+            self.OMT = self.omconfig.getOMT()
         if self.fulldata is not None:
             index = 1
             self.command = self.fulldata[index]
@@ -47,9 +52,8 @@ class CommandData:
             index += 1
             self.payload = self.fulldata[index:index + self.payload_length]
 
-            if self.checkPacket():
-                msg = "[调试信息] Command check passed."
-                print(msg)
+            self.checkPacket()
+
 
     # 内部函数
     def getCMD(self):
@@ -85,13 +89,20 @@ class CommandData:
     # 确定回复的指令是否与发送指令一致
     def checkPacket(self):
         if self.getUserCMD() is not None:
-            msg = "[调试信息] Start Checking command..."
+            msg = debug_log("Start Checking command...")
             print(msg)
+            self.OMT.append(msg)
             if self.getUserCMD()[1:2] != self.getCMD().to_bytes(1, 'big'):
-                msg = f"[调试信息] Command check failed, user input: 0x{self.getUserCMD()[1:2].hex()} but got: 0x{self.getCMD().to_bytes(1, 'big').hex()}"
+                # msg = f"Command check failed, user input: 0x{self.getUserCMD()[1:2].hex()} but got: 0x{self.getCMD().to_bytes(1, 'big').hex()}"
+                msg = debug_log("CMD Check Failed")
                 print(msg)
+                self.OMT.append(msg)
                 self.setUserCMD(None)
                 return False
+            
             else:
                 self.setUserCMD(None)  
+                msg = debug_log("Command check passed.")
+                print(msg)
+                self.OMT.append(msg)
                 return True

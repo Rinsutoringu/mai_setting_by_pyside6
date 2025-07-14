@@ -15,6 +15,7 @@ from PySide6.QtSvg import QSvgRenderer
 from views.mai_button.ButtonStatusWorker import ButtonStatusWorker
 from utils.warning import show_warning
 from utils.svghandle import svgHandle
+from utils.debuglog import debug_log
 
 
 
@@ -133,10 +134,10 @@ class mai_button(QMainWindow):
         # 获取当前按钮状态
         
         current_button_states = self.command_data.getButtonStatus()
-        print("[调试信息]：当前按钮状态数组:", current_button_states)
+        print(debug_log("当前按钮状态数组:", current_button_states))
 
         if current_button_states is None or len(current_button_states) != 64:
-            print("[调试信息]：获取按钮状态数组长度异常，请检查mai_button.py中的getButtonStatus方法")
+            print(debug_log("获取按钮状态数组长度异常，请检查mai_button.py中的getButtonStatus方法"))
             return
         for i in range(34):
             if current_button_states[i] != self._last_button_states[i]:
@@ -334,8 +335,8 @@ class mai_button(QMainWindow):
     #####################################
     def show_svg_on_screenview(self, label_name, color):
         """在屏幕视图上显示SVG（重构后的方法）"""
-        print(f"显示SVG - 标签: {label_name}, 颜色: {color}")
-        
+        print(debug_log("显示SVG - 标签:", label_name, "颜色:", color))
+
         try:
             # 如果有handler，使用它来生成定制化的SVG
             if self.handler:
@@ -348,7 +349,7 @@ class mai_button(QMainWindow):
                     return
             
         except Exception as e:
-            print(f"显示SVG出错: {e}")
+            print(debug_log("显示SVG出错:", e))
             self.show_error_message(f"显示SVG失败: {str(e)}")
 
     def test_button_1_clicked(self):

@@ -1,7 +1,7 @@
 from PySide6.QtCore import QThread, Signal
 
 class ButtonStatusWorker(QThread):
-    status_changed = Signal(dict)
+    status_changed = Signal(list)
 
     def __init__(self, command_data, omconfig, parent=None):
         super().__init__(parent)
@@ -30,10 +30,10 @@ class ButtonStatusWorker(QThread):
             last_status = status
 
             # 如果按钮状态发生变化，发出信号
-            if last_status is not None:
-                print("[调试信息]：按钮状态变化", last_status, "->", status)
-            else:
-                print("[调试信息]：初始按钮状态", status)
+            # if last_status is not None:
+                # print(debug_log("按钮状态变化", last_status, "->", status))
+            # else:
+                # print(debug_log("初始按钮状态", status))
 
     def stop(self):
         self._running = False

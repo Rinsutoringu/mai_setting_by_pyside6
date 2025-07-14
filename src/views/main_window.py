@@ -24,6 +24,8 @@ from utils.port_utils import find_device_usb_path
 from utils.warning import show_warning
 from utils.package_receive import package_receive
 
+from utils.debuglog import debug_log
+
 
 
 class main_window(QMainWindow):
@@ -120,6 +122,9 @@ class main_window(QMainWindow):
             command_data    = self.command_data, 
             main_window_instance = self
         )
+
+        # 保存 miniterminal句柄到omconfig中
+        self.omconfig.setOMT(self.miniterminal)
     ##############################################
     # 事件
     ##############################################
@@ -167,8 +172,8 @@ class main_window(QMainWindow):
         self.command_data.setUserCMD(send_bytes)
         self.input_cmd.clear()
 
-        msg = "[调试信息] Sent command: " + " ".join("0x"+f"{b:02x}" for b in send_bytes)
-        print(msg)
+        msg = "Sent command: " + " ".join("0x"+f"{b:02x}" for b in send_bytes)
+        print(debug_log(msg))
 
 
     def close_windows(self):
@@ -205,8 +210,8 @@ class main_window(QMainWindow):
             if self.devices[i].check_connect():
                 # 提取设备关键信息
                 self.device_selector.addItem(f"Device {i + 1} ({self.devices[i].getDevicePath()[0][58:68]})")
-                msg = f"[调试信息] Device {i + 1} ({self.devices[i].getDevicePath()[0][58:68]}) is connected."
-                print(msg)
+                msg = f"Device {i + 1} ({self.devices[i].getDevicePath()[0][58:68]}) is connected."
+                print(debug_log(msg))
 
     def on_device_selected(self, index):
         """
@@ -309,9 +314,9 @@ class main_window(QMainWindow):
         deviceComm.start_listening(callback=self.on_serial_data)
     
         # DEBUG
-        print(f"[调试信息] Selected device: {device}")
-        # print(f"[调试信息] Selected deviceComm: {deviceComm}")
-        print(f"[调试信息] Device connected, in port {port}")
+        print(debug_log(f"Selected device: {device}"))
+        print(debug_log(f"Selected deviceComm: {deviceComm}"))
+        print(debug_log(f"Device connected, in port {port}"))
 
         return True
 
@@ -319,14 +324,13 @@ class main_window(QMainWindow):
         """
         串口数据接收回调函数
         """
-        # print("[调试信息] 接收到数据: " + " ".join("0x"+f"{b:02x}" for b in data))
+        # print(debug_log("接收到数据:", " ".join("0x"+f"{b:02x}" for b in data)))
         result = self.package_receiver.receive_byte(data)
         # 如果接收到完整的数据包，处理数据包
         if result is not None:
             self.command_data.setFullData(result)
-            
 
-        # self.miniterminal.append(f"<span style='color:blue;'>{self.command_data.getParams()}</span>")
+        # self.miniterminal.append(f"<span style='color:blue;'>{result}</span>")
 
     ##############################################
 

@@ -1,3 +1,5 @@
+from utils.debuglog import debug_log
+
 class package_receive:
     AWAIT = 0       # 待命
     IN_PACKET = 1   # 正在读取
@@ -8,10 +10,13 @@ class package_receive:
         self.buffer = bytearray()
         self.packet = bytearray()
         self.omconfig = omconfig
+        self.OMT = None
 
     def receive_byte(self, byte):
+        # if self.OMT is None:
+        #     self.OMT = self.omconfig.getOMT()
         
-        # print("[调试信息]：传入的数据:", " ".join(f"0x{b:02x}" for b in byte))
+        # print(debug_log("传入的数据:", " ".join(f"0x{b:02x}" for b in byte)))
         for i in byte:
             if self.state == self.AWAIT:
                 # 如果当前状态是待命状态，检查当前字节是否是包开始标志
@@ -32,7 +37,8 @@ class package_receive:
                 # 检查数据缓冲区是否已经接收完一个完整的数据包
                 if self.isFinish():
                     self.state = self.AWAIT
-                    # print("[调试信息]：当前数据包接收完成:", " ".join(f"0x{b:02x}" for b in self.buffer))
+                    # print(debug_log("当前数据包接收完成:", " ".join(f"0x{b:02x}" for b in self.buffer)))
+                    # self.OMT.append(debug_log("当前数据包接收完成"))
                     return self.buffer
                 
             if self.state == self.ESCAPE:

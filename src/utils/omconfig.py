@@ -4,6 +4,12 @@ class omConfig:
         self.serial_update_time = self.update_time
         self.display_update_time = self.update_time
 
+        ###############################
+        # please do not edit this config
+        ###############################
+        self.omt = None
+
+
     def getUpdateTime(self):
         return self.update_time
     
@@ -12,3 +18,9 @@ class omConfig:
 
     def getDisplayUpdateTime(self):
         return self.display_update_time
+    
+    def setOMT(self, omt):
+        self.omt = omt
+
+    def getOMT(self):
+        return self.omt

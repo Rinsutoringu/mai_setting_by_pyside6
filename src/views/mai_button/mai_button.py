@@ -139,7 +139,7 @@ class mai_button(QMainWindow):
             print(debug_log("获取按钮状态数组长度异常，请检查mai_button.py中的getButtonStatus方法"))
             return
 
-        if current_button_states[34] == self._last_button_states:
+        if current_button_states[:34] == self._last_button_states:
             return
         
         print(debug_log("当前按钮状态数组:", current_button_states))

@@ -9,31 +9,35 @@ class package_receive:
         self.packet = bytearray()
     
     def receive_byte(self, byte):
-        if self.state == self.AWAIT:
-            # 如果当前状态是待命状态，检查当前字节是否是包开始标志
-            # 如果是包开始标志，就将状态设置为正在读取状态，并清空
-            if byte == 0x53:
-                self.state = self.IN_PACKET
-                self.buffer.clear()
+        
+        # print("[调试信息]：传入的数据:", " ".join(f"0x{b:02x}" for b in byte))
+        for i in byte:
+            if self.state == self.AWAIT:
+                # 如果当前状态是待命状态，检查当前字节是否是包开始标志
+                # 如果是包开始标志，就将状态设置为正在读取状态，并清空
+                if i == 0x53:
+                    self.state = self.IN_PACKET
+                    self.buffer.clear()
 
-        # 如果当前状态是正在读取状态
-        if self.state == self.IN_PACKET:
-            # 如果当前字节是转义字符就直接跳过
-            if byte == 0x7c:
-                self.state = self.ESCAPE
-                return
-            else :
-                # 如果当前字节不是转义字符，就将其添加到数据缓冲区
-                self.buffer.append(byte)
-            # 检查数据缓冲区是否已经接收完一个完整的数据包
-            if self.isFinish():
-                self.state = self.AWAIT
-                return self.buffer
-            
-        if self.state == self.ESCAPE:
-            # 如果当前状态是转义状态，无论下一个字节是什么，都将其添加到数据缓冲区
-            self.buffer.append(byte)
-            self.state = self.IN_PACKET
+            # 如果当前状态是正在读取状态
+            if self.state == self.IN_PACKET:
+                # 如果当前字节是转义字符就直接跳过
+                if i == 0x7c:
+                    self.state = self.ESCAPE
+                    return
+                else :
+                    # 如果当前字节不是转义字符，就将其添加到数据缓冲区
+                    self.buffer.append(i)
+                # 检查数据缓冲区是否已经接收完一个完整的数据包
+                if self.isFinish():
+                    self.state = self.AWAIT
+                    # print("[调试信息]：当前数据包接收完成:", " ".join(f"0x{b:02x}" for b in self.buffer))
+                    return self.buffer
+                
+            if self.state == self.ESCAPE:
+                # 如果当前状态是转义状态，无论下一个字节是什么，都将其添加到数据缓冲区
+                self.buffer.append(i)
+                self.state = self.IN_PACKET
 
 
     def isFinish(self):

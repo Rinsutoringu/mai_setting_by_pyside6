@@ -141,6 +141,7 @@ class main_window(QMainWindow):
         else :
             show_warning("error", "Unknown command!")
             self.input_cmd.clear()
+            return
 
         # 转成16进制字节并拼接数据
         send_bytes = bytes([0x53, send_bytes, 0x00])
@@ -148,7 +149,7 @@ class main_window(QMainWindow):
         self.command_data.setUserCMD(send_bytes)
         self.input_cmd.clear()
 
-        msg = "[调试信息] Sent command: " + " ".join(f"{b:02x}" for b in send_bytes)
+        msg = "[调试信息] Sent command: " + " ".join("0x"+f"{b:02x}" for b in send_bytes)
         print(msg)
 
 

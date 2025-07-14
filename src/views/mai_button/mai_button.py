@@ -138,16 +138,21 @@ class mai_button(QMainWindow):
         for i in range(34):
             if current_button_states[i] != self._last_button_states[i]:
                 # 如果状态发生变化，更新SVG
-                label_name = f"{chr(65 + i // 2)}{i % 2 + 1}"
-                color = self.A_newcolor if i < 8 else (
-                    self.B_newcolor if i < 16 else (
-                        self.C_newcolor if i < 18 else (
-                            self.D_newcolor if i < 26 else (
-                                self.E_newcolor if i < 34 else self.oldcolor
-                            )
-                        )
-                    )
-                )
+                if i < 8:
+                    label_name = "A" + str(i+1)
+                    color = self.A_newcolor if current_button_states[i] else self.oldcolor
+                elif i < 16:
+                    label_name = "B" + str(i+1 - 8)
+                    color = self.B_newcolor if current_button_states[i] else self.oldcolor
+                elif i < 18:
+                    label_name = "C" + str(i+1 - 16)
+                    color = self.C_newcolor if current_button_states[i] else self.oldcolor
+                elif i < 26:
+                    label_name = "D" + str(i+1 - 18)
+                    color = self.D_newcolor if current_button_states[i] else self.oldcolor
+                elif i < 34:
+                    label_name = "E" + str(i+1 - 26)
+                    color = self.E_newcolor if current_button_states[i] else self.oldcolor
                 self.show_svg_on_screenview(label_name, color)
             # 更新缓存状态
             self._last_button_states[i] = current_button_states[i]

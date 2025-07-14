@@ -7,21 +7,32 @@ class ButtonStatusWorker(QThread):
         super().__init__(parent)
         self.command_data = command_data
         self._running = True
+        self.sleep_time = 100  # 默认轮询时间为100毫秒
 
     def run(self):
         last_status = None
         while self._running:
-            # 获取按钮状态
-            # print("Polling button status...")
-            status = self.command_data.getButtonStatus()
-            if status is None:
-                # print("No button status available.")
+            # 等待一段时间以避免过于频繁的轮询
+            self.msleep(self.sleep_time)
+
+            # 如果数据包指令不是0x12，继续等待
+            if self.command_data.getCMD() != 0x12:
                 continue
-            print("获取有效按钮状态")
-            if status != last_status:
-                self.status_changed.emit(status)
-                last_status = status
-            self.msleep(100) #轮询时间配置
+
+            status = self.command_data.getButtonStatus()
+            # 如果按钮状态无效或未变化，继续等待
+            if (not status) or (status == last_status):
+                continue
+
+            # 如果按钮状态有效且发生变化，发出信号
+            self.status_changed.emit(status)
+            last_status = status
+
+            # 如果按钮状态发生变化，发出信号
+            if last_status is not None:
+                print("[调试信息]：按钮状态变化", last_status, "->", status)
+            else:
+                print("[调试信息]：初始按钮状态", status)
 
     def stop(self):
         self._running = False

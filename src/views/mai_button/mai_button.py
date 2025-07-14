@@ -124,35 +124,31 @@ class mai_button(QMainWindow):
         后台线程信号回调，根据按钮状态渲染SVG。
         只对状态发生变化的按钮进行渲染，提高效率。
         """
-        print("按钮状态更新，重新渲染SVG")
-        # show_svg_on_screenview
-        # TODO
-        # 维护上一次获取按钮的状态 进行差量更新以降低性能开销
-        
         # 初始化缓存数组
         if not hasattr(self, '_last_button_states'):
             self._last_button_states = [None] * 34
         # 获取当前按钮状态
         current_button_states = self.command_data.getButtonStatus()
-        # 遍历current_button_states
-        # for i in range(len(current_button_states)):
-            # 查找状态发生变化的按钮
-            # if current_button_states[i] != self._last_button_states[i]:
-            #     # 根据按钮索引选择对应的标签和颜色
-            #     if i < 8:
-            #         self.show_svg_on_screenview(f"A{i+1}", self.A_newcolor)
-            #     elif i >= 8 and i < 16:
-            #         self.show_svg_on_screenview(f"B{i-8+1}", self.B_newcolor)
-            #     elif i >= 16 and i < 18:
-            #         self.show_svg_on_screenview(f"C{i-16+1}", self.C_newcolor)
-            #     elif i >= 18 and i < 26:
-            #         self.show_svg_on_screenview(f"D{i-18+1}", self.D_newcolor)
-            #     elif i >= 26 and i < 34:
-            #         self.show_svg_on_screenview(f"E{i-26+1}", self.E_newcolor)
-            #     else:
-            #         print(f"未知按钮索引: {i}")                
+        if current_button_states is None or len(current_button_states) != 34:
+            print("[调试信息]：获取按钮状态数组长度异常，请检查mai_button.py中的getButtonStatus方法")
+            return
+        for i in range(34):
+            if current_button_states[i] != self._last_button_states[i]:
+                # 如果状态发生变化，更新SVG
+                label_name = f"{chr(65 + i // 2)}{i % 2 + 1}"
+                color = self.A_newcolor if i < 8 else (
+                    self.B_newcolor if i < 16 else (
+                        self.C_newcolor if i < 18 else (
+                            self.D_newcolor if i < 26 else (
+                                self.E_newcolor if i < 34 else self.oldcolor
+                            )
+                        )
+                    )
+                )
+                self.show_svg_on_screenview(label_name, color)
+            # 更新缓存状态
+            self._last_button_states[i] = current_button_states[i]
 
-        # self._last_button_states = current_button_states
 
     def close_windows(self):
         """

@@ -5,9 +5,10 @@
 1. 安装python3.11.0
 2. 在vscode安装[此工作区](https://vscode.dev/profile/github/e08014ef3e90bcf48ff1c36b88701828)
 3. 使用`requirements.txt`创建python venv
-4. 激活虚拟环境
-5. 将硬件接入PC
-6. 开启调试选项，选择`DEBUG Full Project`
+4. 正确配置pyusb依赖
+5. 激活虚拟环境
+6. 将硬件接入PC
+7. 开启调试选项，选择`DEBUG Full Project`
 
 此时，项目应该启动
 

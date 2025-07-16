@@ -76,7 +76,12 @@ def find_device_usb_path(vid, pid):
 
     # 识别当前电脑上接入的全部合法设备
     device_serial = []
-    usb_devices = usb.core.find(find_all=True, idVendor=input_vid, idProduct=input_pid)
+    try:
+        usb_devices = usb.core.find(find_all=True, idVendor=input_vid, idProduct=input_pid)
+    except Exception:
+        print("PyUSB配置有错误，请检查 PyUSB 是否正确安装")
+        print("请参考https://www.cnblogs.com/chen55555/p/18006126")
+    
     for index, usb_device in enumerate(usb_devices):
         try:
             serial_number = usb.util.get_string(usb_device, usb_device.iSerialNumber)

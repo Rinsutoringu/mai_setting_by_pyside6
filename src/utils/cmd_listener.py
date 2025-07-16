@@ -4,15 +4,17 @@ from utils.debuglog import debug_log
 
 class CMD_listener(QThread):
 
-    def __init__(self, command_data, omconfig, package_receiver, parent=None):
+    def __init__(self, omconfig, command_data, package_receiver, parent=None):
         super().__init__(parent)
+        self.omconfig = omconfig  # 保存omconfig对象
+        self.signal = self.omconfig.getSignal()  # 获取信号句柄
         self.command_data = command_data
-        self.omconfig = omconfig
         self._running = True
         self.sleep_time = self.omconfig.getUpdateTime()
         self.signal = self.omconfig.getSignal() # 获取信号句柄
         self.package_receiver = package_receiver
         self.isReceive = False # 信号量
+
 
     def run(self):
         while self._running:

@@ -1,14 +1,15 @@
 class omConfig:
     def __init__(self):
-        self.update_time = 50
+        self.update_time = 100
         self.serial_update_time = self.update_time
         self.display_update_time = self.update_time
 
         ###############################
         # please do not edit this config
         ###############################
+        
+        # 信号对象，各线程通过本类进行沟通
         self.signal = None
-        self.cmdsignal = None
 
 
     def getUpdateTime(self):

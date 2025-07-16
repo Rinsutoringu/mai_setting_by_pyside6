@@ -138,15 +138,16 @@ class mai_button(QMainWindow):
         if current_button_states is None or len(current_button_states) != 64:
             print(debug_log("获取按钮状态数组长度异常，请检查mai_button.py中的getButtonStatus方法"))
             return
+        state = current_button_states[8:42]
 
-        if current_button_states[:34] == self._last_button_states:
+        if state == self._last_button_states:
             return
         
         print(debug_log("当前按钮状态数组:", current_button_states))
 
 
         for i in range(34):
-            if current_button_states[i] != self._last_button_states[i]:
+            if state[i] != self._last_button_states[i]:
                 # 如果状态发生变化，更新SVG
                 if i < 8:
                     label_name = "A" + str(i+1)
